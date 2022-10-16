@@ -19,6 +19,11 @@ import {
   TablePagination,
   TextField,
   FormControl,
+  MenuItem,
+  Select,
+  InputLabel,
+  TextareaAutosize,
+  Autocomplete,
 } from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -74,7 +79,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function User() {
+export default function AddCode() {
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -148,13 +153,18 @@ export default function User() {
     boxShadow: 24,
     p: 10,
   };
+  const [id, setId] = useState('');
 
+  const handleChange = (event) => {
+    setId(event.target.value);
+  };
+  const top100Films = [{ label: '1' }, { label: '2' }, { label: '3' }];
   return (
-    <Page title="User">
+    <Page title="AddCode">
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            User
+            Add Code
           </Typography>
           <Button
             variant="contained"
@@ -172,14 +182,18 @@ export default function User() {
             aria-describedby="modal-modal-description"
           >
             <form>
-              <Box sx={style} display="flex" flexDirection="column">
-                <FormControl spacing={20}>
-                  <TextField id="first_name" label="First Name" variant="outlined" />
-                  <TextField id="last_name" label="Last Name" variant="outlined" />
-                  <TextField id="email" label="Email" variant="outlined" type="email" />
-                  <TextField id="password" label="Password" variant="outlined" type="password" />
+              <Box sx={style}>
+                <FormControl>
+                  <Autocomplete
+                    style={{ marginBottom: '20px' }}
+                    disablePortal
+                    id="combo-box-demo"
+                    options={top100Films}
+                    sx={{ width: 300 }}
+                    renderInput={(params) => <TextField {...params} label="User id" />}
+                  />
+                  <TextareaAutosize minRows={6} style={{ width: 400 }} />
                 </FormControl>
-                <Button> Submit</Button>
               </Box>
             </form>
           </Modal>

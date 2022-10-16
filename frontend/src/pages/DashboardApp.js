@@ -1,7 +1,25 @@
 import { faker } from '@faker-js/faker';
+import { useState } from 'react';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography } from '@mui/material';
+import {
+  Grid,
+  Container,
+  Typography,
+  Box,
+  TextField,
+  Select,
+  InputLabel,
+  FormControl,
+  MenuItem,
+  Input,
+} from '@mui/material';
+
+import dayjs from 'dayjs';
+
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 // components
 import Page from '../components/Page';
 import Iconify from '../components/Iconify';
@@ -19,10 +37,13 @@ import {
 } from '../sections/@dashboard/app';
 
 // ----------------------------------------------------------------------
-
 export default function DashboardApp() {
   const theme = useTheme();
+  const [show, setShow] = useState(false);
+  const [showdomain, setShowDomain] = useState(false);
+  const [fromdate, setFromDate] = useState(dayjs('2022-04-07'));
 
+  const [todate, setToDate] = useState(dayjs('2022-04-07'));
   return (
     <Page title="Dashboard">
       <Container maxWidth="xl">
@@ -30,23 +51,120 @@ export default function DashboardApp() {
           Hi, Welcome back
         </Typography>
 
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Weekly Sales" total={714000} icon={'ant-design:android-filled'} />
+        <Grid container spacing={3} justifyContent="center">
+          <Grid item xs={12} sm={6} md={3} lg={2}>
+            <AppWidgetSummary title="Impressions" total={714000} icon={'ant-design:facebook-filled'} />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="New Users" total={1352831} color="info" icon={'ant-design:apple-filled'} />
+          <Grid item xs={12} sm={6} md={3} lg={2}>
+            <AppWidgetSummary title="e CPM" total={1352831} color="info" icon={'ant-design:monitor-outlined'} />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Item Orders" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
+          <Grid item xs={12} sm={6} md={3} lg={2}>
+            <AppWidgetSummary
+              title="Estimated Revenue"
+              total={1723315}
+              color="warning"
+              icon={'ant-design:dollar-outlined'}
+            />
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Bug Reports" total={234} color="error" icon={'ant-design:bug-filled'} />
+          <Grid item xs={12} sm={6} md={3} lg={2}>
+            <AppWidgetSummary title="This Month Revenue" total={234} color="info" icon={'ant-design:rise-outlined'} />
           </Grid>
-
+          <Grid item xs={12} sm={6} md={3} lg={2}>
+            <AppWidgetSummary
+              title="Last Month Revenue"
+              total={234}
+              color="info"
+              icon={'ant-design:line-chart-outlined'}
+            />
+          </Grid>
+          <Grid item xs={12} md={6} lg={8} container spacing={3} justifyContent="center">
+            <Grid item xs={12} md={4} lg={6}>
+              <Box sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <Select labelId="demo-simple-select-label" id="demo-simple-select" label="Domain" defaultValue={5}>
+                    <MenuItem value={5}>Select Domain</MenuItem>
+                    <MenuItem value={10}>www.xyz.com</MenuItem>
+                    <MenuItem value={20}>www.abc.xom</MenuItem>
+                    <MenuItem value={30}>www.123.com</MenuItem>
+                    <MenuItem
+                      value={30}
+                      onClick={() => {
+                        setShowDomain(true);
+                      }}
+                    >
+                      Enter Custome domain
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={4} lg={6}>
+              <Box sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <Select labelId="demo-simple-select-label" id="demo-simple-select" label="Domain" defaultValue={5}>
+                    <MenuItem value={5}>Select Time Period</MenuItem>
+                    <MenuItem value={10}>Daily</MenuItem>
+                    <MenuItem value={20}>Weekly</MenuItem>
+                    <MenuItem value={30}>Montly</MenuItem>
+                    <MenuItem value={30} onClick={() => setShow(true)}>
+                      Cutome Range
+                    </MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            </Grid>
+          </Grid>
+          {show && (
+            <Grid
+              item
+              xs={12}
+              md={6}
+              lg={8}
+              container
+              spacing={3}
+              justifyContent="center"
+              style={{ marginTop: '50px' }}
+            >
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimePicker
+                  renderInput={(props) => <TextField {...props} />}
+                  label="From Date"
+                  value={fromdate}
+                  onChange={(newValue) => {
+                    setFromDate(newValue);
+                  }}
+                />
+                <DateTimePicker
+                  renderInput={(props) => <TextField {...props} />}
+                  label="To Dat Date"
+                  value={todate}
+                  onChange={(newValue) => {
+                    setToDate(newValue);
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid>
+          )}
+          {showdomain && (
+            <Grid
+              item
+              xs={12}
+              md={6}
+              lg={8}
+              container
+              spacing={3}
+              justifyContent="center"
+              style={{ marginTop: '50px' }}
+            >
+              <Box>
+                <InputLabel title="Enter domain" />
+                <Input type="text" />
+              </Box>
+            </Grid>
+          )}
           <Grid item xs={12} md={6} lg={8}>
             <AppWebsiteVisits
               title="Website Visits"

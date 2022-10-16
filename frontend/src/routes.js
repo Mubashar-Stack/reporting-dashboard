@@ -10,14 +10,14 @@ import NotFound from './pages/Page404';
 import Register from './pages/Register';
 import Products from './pages/Products';
 import DashboardApp from './pages/DashboardApp';
+import AddCode from './pages/AddCode';
 
 // ----------------------------------------------------------------------
 
-export default function Router({isLoggedIn}) {
-
- console.log('============isLoggedIn========================');
- console.log(isLoggedIn);
- console.log('====================================');
+export default function Router({ isLoggedIn }) {
+  console.log('============isLoggedIn========================');
+  console.log(isLoggedIn);
+  console.log('====================================');
 
   return useRoutes([
     {
@@ -28,6 +28,7 @@ export default function Router({isLoggedIn}) {
         { path: 'user', element: <User /> },
         { path: 'products', element: <Products /> },
         { path: 'blog', element: <Blog /> },
+        { path: 'addcode', element: <AddCode /> },
       ],
     },
     {
