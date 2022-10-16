@@ -6,11 +6,20 @@ const routes = require('./routes');
 const errorHandler = require('express-json-errors');
 const middlewareErrorParser = require('./middleware/ErrorParser');
 const middlewarePathLogger = require('./middleware/PathLogger');
+const fileUpload = require('express-fileupload');
 
 const app = express();
 
 app.use(express.json({type: "application/json"}));
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static('uploads'));
+
+app.use(fileUpload({
+  createParentPath: true,
+  limits: { 
+    fileSize: 5 * 1024 * 1024 * 1024 //2MB max file(s) size
+},
+}));
 
 // add cors headers
 app.use(cors());
