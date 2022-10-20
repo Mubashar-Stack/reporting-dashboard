@@ -5,7 +5,7 @@ const db_write = mysql.createConnection({
     host     : process.env.DB_WRITE_HOST || 'localhost',
     user     : process.env.DB_USERNAME   || 'root',
     password : process.env.DB_PASSWORD   || '',
-    database : process.env.DB_DATABASE   || 'test',
+    database : process.env.DB_DATABASE   || 'database',
     port     : process.env.DB_PORT       || 3306
 });
 
@@ -13,7 +13,7 @@ const db_read = mysql.createConnection({
     host     : process.env.DB_READ_HOST || 'localhost',
     user     : process.env.DB_USERNAME  || 'root',
     password : process.env.DB_PASSWORD  || '',
-    database : process.env.DB_DATABASE  || 'test',
+    database : process.env.DB_DATABASE  || 'database',
     port     : process.env.DB_PORT      || 3306
 });
 

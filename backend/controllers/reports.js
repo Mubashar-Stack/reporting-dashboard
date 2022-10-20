@@ -46,6 +46,7 @@ function addReport(req, res) {
             Ad_Impressions: row["Ad Impressions"],
             Revenue: row["Revenue (USD)"],
             eCPM: row["eCPM"],
+            commission: req.body.commission,
             create_at: new Date(req.body.date),
             updated_at: new Date(req.body.date),
           }
