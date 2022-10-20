@@ -18,8 +18,8 @@ const ContentStyle = styled('div')(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   flexDirection: 'column',
-  padding: theme.spacing(4, 12),
-  margin: theme.spacing(3, 0),
+  padding: theme.spacing(12, 12),
+  margin: theme.spacing(5, 0),
   backgroundColor: '#fff',
 }));
 

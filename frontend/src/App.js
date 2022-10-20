@@ -9,7 +9,7 @@ import { BaseOptionChartStyle } from './components/chart/BaseOptionChart';
 // ----------------------------------------------------------------------
 
 export default function App() {
-  const isLoggedIn  = window.localStorage.getItem('token');
+  const isLoggedIn  = window.localStorage.getItem('type');
  
   return (
     <ThemeProvider>

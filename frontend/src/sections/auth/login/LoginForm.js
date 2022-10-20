@@ -1,6 +1,8 @@
 import * as Yup from 'yup';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
 // form
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -14,6 +16,7 @@ import { FormProvider, RHFTextField, RHFCheckbox } from '../../../components/hoo
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
+  /* eslint-disable */
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -39,12 +42,35 @@ export default function LoginForm() {
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = async () => {
-   
-    try {
-      window.localStorage.setItem('token', true);
-    } catch (err) {console.log(err);}
-    navigate('/dashboard/app', { replace: true });
+  const onSubmit = async (values) => {
+    const data = JSON.stringify(values);
+    const config = {
+      method: 'post',
+      url: 'http://localhost:5000/auth/login',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: data,
+    };
+    axios(config)
+      .then(function (response) {
+        const result = JSON.parse(JSON.stringify(response.data));
+        console.log(result,result?.data,result?.type);
+        try {
+          window.localStorage.setItem('token', result?.data);
+          window.localStorage.setItem('type', result?.type);
+        } catch (err) {
+          console.log(err);
+        }
+        if (result?.type == 'admin') {
+          navigate('/dashboard/app', { replace: true });
+        } else {
+          navigate('/customerDashboard/app', { replace: true });
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
 
   return (
