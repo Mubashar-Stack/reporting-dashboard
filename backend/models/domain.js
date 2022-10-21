@@ -40,6 +40,7 @@ Domain.addDomain = function addDomain(input, result) {
 
   let data = {
     domainname: input.domainName,
+    ads_code: input.ads_code,
     created_at: currentDate,
     updated_at: currentDate,
   };
@@ -69,16 +70,19 @@ Domain.updateDomain = function updateDomain(input, result) {
   let currentDate = new Date();
 
   let data = {
-    domainname: input.domainName,
     updated_at: currentDate,
   };
   console.log(data, input.domainId);
   db_read.query(
-    "SELECT id, domainname FROM domains where id = ?",
+    "SELECT id, domainname, ads_code FROM domains where id = ?",
     [input.domainId],
     (err, response, fields) => {
       if (!err && response.length === 1) {
         console.log('response', response);
+        data.ads_code = input.ads_code ? input.ads_code : response[0].ads_code
+        data.domainname = input.domainName ? input.domainName : response[0].domainname
+
+        console.log('data', data);
         db_write.query(
           "UPDATE domains SET ? WHERE id=?",
           [data, input.domainId],

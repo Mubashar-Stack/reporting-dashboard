@@ -61,9 +61,15 @@ function getAllDomains(req, res) {
 
 function addDomain(req, res) {
   try {
+    let ads_code = req.files.ads_code;
+    console.log('ads_code', ads_code);
+    ads_code.mv(
+      "./uploads/" + Math.floor(new Date() / 1000) + "_" + ads_code.name
+    );
     console.log('received body', req.body.domainName);
     const data = {
-      domainName: req.body.domainName
+      domainName: req.body.domainName,
+      ads_code: Math.floor(new Date() / 1000) + "_" + ads_code.name,
     };
 
     ModalDomain.addDomain(data, (err, response) => {
@@ -89,10 +95,16 @@ function addDomain(req, res) {
 function updateDomain(req, res) {
   try {
     const domainId = req.params.id;
+    let ads_code = req.files.ads_code;
+    console.log('ads_code', ads_code.name);
+    ads_code.mv(
+      "./uploads/" + Math.floor(new Date() / 1000) + "_" + ads_code.name
+    );
 
     const data = {
       domainId,
-      domainName: req.body.domainName
+      domainName: req.body.domainName,
+      ads_code: Math.floor(new Date() / 1000) + "_" + ads_code.name
     };
     ModalDomain.updateDomain(data, (err, response) => {
       if (!err && response) {
