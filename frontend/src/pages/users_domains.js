@@ -1,9 +1,11 @@
+ /* eslint-disable */
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
+import axios from 'axios';
 import {
   Card,
   Table,
@@ -29,35 +31,19 @@ import Label from '../components/Label';
 import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
-import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
-import { RegisterForm } from '../sections/@dashboard/user/add';
+import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/users_domains';
+import { RegisterForm } from '../sections/@dashboard/users_domains/add';
 
-// mock
-import USERLIST from '../_mock/user';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
-  { id: 'company', label: 'Company', alignRight: false },
-  { id: 'role', label: 'Role', alignRight: false },
-  { id: 'isVerified', label: 'Verified', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
+  { id: 'domains', label: 'Domains', alignRight: false },
+  { id: 'createdAt', label: 'Created At', alignRight: false },
   { id: '' },
 ];
 
-
-const ContentStyle = styled('div')(({ theme }) => ({
-  maxWidth: 480,
-  // margin: 'auto',
-  minHeight: '70vh',
-  display: 'flex',
-  justifyContent: 'center',
-  flexDirection: 'column',
-  padding: theme.spacing(12, 12),
-  margin: theme.spacing(5, 0),
-  backgroundColor: '#fff'
-}));
 // ----------------------------------------------------------------------
 
 function descendingComparator(a, b, orderBy) {
@@ -84,7 +70,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.domainname.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
@@ -104,6 +90,26 @@ export default function User() {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [allDomainList, setAllDomainList] = useState([]);
+
+  useEffect(() => {
+    let config = {
+      method: 'get',
+      url: 'http://localhost:5000/users_domains',
+      headers: {},
+    };
+    axios(config)
+      .then(function (response) {
+        console.log(JSON.parse(JSON.stringify(response.data.data)));
+        setAllDomainList(JSON.parse(JSON.stringify(response.data.data)));
+
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }, []);
+
+
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -112,7 +118,7 @@ export default function User() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = allDomainList.map((n) => n.id);
       setSelected(newSelecteds);
       return;
     }
@@ -147,17 +153,17 @@ export default function User() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - allDomainList.length) : 0;
 
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(allDomainList, getComparator(order, orderBy), filterName);
 
   const isUserNotFound = filteredUsers.length === 0;
   const style = {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 500,
+    top: '40%',
+    left: '40%',
+    transform: 'translate(-40%, -40%)',
+    // width: 500,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -169,7 +175,7 @@ export default function User() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            User
+            Users Domains
           </Typography>
           <Button
             variant="contained"
@@ -178,7 +184,7 @@ export default function User() {
             to="#"
             startIcon={<Iconify icon="eva:plus-fill" />}
           >
-            New User
+            New Domain
           </Button>
           <Modal
             open={open}
@@ -186,18 +192,15 @@ export default function User() {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-            <Container maxWidth="sm">
-              <ContentStyle>
-                <Typography variant="h4" gutterBottom>
-                  Add New User
-                </Typography>
+            {/* <Box sx={{ ...style, width: '50%',}}>
+              <Typography variant="h4" gutterBottom>
+                Add New User
+              </Typography>
 
-                <Typography sx={{ color: 'text.secondary', mb: 5 }}>Enter your details below.</Typography>
+              <Typography sx={{ color: 'text.secondary', mb: 5 }}>Enter your details below.</Typography> */}
 
-
-                <RegisterForm />
-              </ContentStyle>
-            </Container>
+              <RegisterForm />
+            {/* </Box> */}
           </Modal>
         </Stack>
 
@@ -211,15 +214,15 @@ export default function User() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={allDomainList.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, role, status, company, avatarUrl, isVerified } = row;
-                    const isItemSelected = selected.indexOf(name) !== -1;
+                    const { id, domainname,first_name,last_name, photo, created_at } = row;
+                    const isItemSelected = selected.indexOf(domainname) !== -1;
 
                     return (
                       <TableRow
@@ -231,23 +234,19 @@ export default function User() {
                         aria-checked={isItemSelected}
                       >
                         <TableCell padding="checkbox">
-                          <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, name)} />
+                         
                         </TableCell>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={name} src={avatarUrl} />
+                            <Avatar alt={first_name} src={`http://localhost:5000/${photo}`} />
                             <Typography variant="subtitle2" noWrap>
-                              {name}
+                              {`${first_name} ${last_name}`}
                             </Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell align="left">{company}</TableCell>
-                        <TableCell align="left">{role}</TableCell>
-                        <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell>
+                        <TableCell align="left">{domainname}</TableCell>
                         <TableCell align="left">
-                          <Label variant="ghost" color={(status === 'banned' && 'error') || 'success'}>
-                            {sentenceCase(status)}
-                          </Label>
+                        {new Date(created_at).toString()}
                         </TableCell>
 
                         <TableCell align="right">
@@ -279,7 +278,7 @@ export default function User() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={allDomainList.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

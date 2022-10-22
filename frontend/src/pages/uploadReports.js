@@ -46,10 +46,7 @@ import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/reports';
-// import { RegisterForm } from '../sections/@dashboard/user/add';
 
-// mock
-// import USERLIST from '../_mock/user';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -64,7 +61,6 @@ const TABLE_HEAD = [
   { id: 'createdAt', label: 'Created At', alignCenter: false },
 ];
 
-const USERLIST = [];
 
 const ContentStyle = styled('div')(({ theme }) => ({
   maxWidth: 480,

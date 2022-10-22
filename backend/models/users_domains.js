@@ -13,7 +13,7 @@ const UserDomain = (data) => {
 
 UserDomain.findById = function getUserDomainById(userDomainId, result) {
   db_read.query(
-    "Select * from users_domains where id = ?", userDomainId,
+    "SELECT a.*, b.first_name,b.last_name,b.photo,c.domainname FROM users_domains AS a JOIN users AS b ON a.user_id = b.id JOIN domains AS c ON a.domain_id = c.id  WHERE a.id = ?", userDomainId,
     function (err, res) {
       if (err) {
         console.log("error: ", err);
@@ -40,7 +40,7 @@ UserDomain.getUserDomainsById = function getUserDomainByUserId(user_id, result) 
 };
 
 UserDomain.getUserDomains = function getAllUserDomains(result) {
-  db_read.query("Select * from users_domains", function (err, res) {
+  db_read.query("SELECT a.*, b.first_name,b.last_name,b.photo,c.domainname FROM users_domains AS a JOIN users AS b ON a.user_id = b.id JOIN domains AS c ON a.domain_id = c.id", function (err, res) {
     if (err) {
       console.log("error: ", err);
       result(err, null);

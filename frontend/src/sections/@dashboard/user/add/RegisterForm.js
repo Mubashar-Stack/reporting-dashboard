@@ -14,17 +14,30 @@ import { Stack, IconButton, InputAdornment } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
+import axios from 'axios';
+
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 import Iconify from '../../../../components/Iconify';
 
 const steps = ['User Detail', 'Payment details'];
 
-export default function HorizontalLabelPositionBelowStepper() {
+export default function HorizontalLabelPositionBelowStepper(props) {
+  const { isEdit, isView, data } = props;
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = React.useState(0);
   const [showPassword, setShowPassword] = React.useState(false);
+  const [disabled, setDisabled] = React.useState(false);
+  const [isFileChange, setIsFileChange] = React.useState(false);
+  const [isChangedPassword, setIsChangedPassword] = React.useState(false);
+
+
   const [files, setFiles] = React.useState([]);
   const [url, setURL] = React.useState('https://www.w3schools.com/howto/img_avatar.png');
+  const [avatar, setAvatar] = React.useState('https://www.w3schools.com/howto/img_avatar.png');
+
 
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
@@ -32,19 +45,123 @@ export default function HorizontalLabelPositionBelowStepper() {
   const [password, setPassword] = React.useState('');
   const [nameCardHolder, setNameCardHolder] = React.useState('');
   const [cardNumber, setCardNumber] = React.useState('');
-  const [cardExpire, setCardExpire] = React.useState('');
+  const [cardExpire, setCardExpire] = React.useState(new Date());
   const [cardCSV, setCardCSV] = React.useState('');
+
+  React.useEffect(() => {
+    if (isEdit || isView) {
+      let config = {
+        method: 'get',
+        url: `http://localhost:5000/users/${data?.id}`,
+        headers: {},
+      };
+      axios(config)
+        .then(function (response) {
+          const User = JSON.parse(JSON.stringify(response.data.data));
+          setURL(`http://localhost:5000/${User?.photo}`);
+          setAvatar(User?.photo);
+          setFirstName(User?.first_name);
+          setLastName(User?.last_name);
+          setPassword(User?.password);
+          setEmail(User?.email);
+          setNameCardHolder(User?.card_name);
+          setCardNumber(User?.card_number);
+          setCardExpire(User?.expiry_date);
+          setCardCSV(User?.cvc);
+          setDisabled(isEdit ? false : true);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+  }, []);
 
   const handleNext = () => {
     if (activeStep === steps.length - 1) {
-      const values = {
-        firstName: firstName,
-        lastName: lastName,
-        photo: files,
-        email: email,
-        password: password,
-      };
-      console.log(values,'values');
+      if (isEdit) {
+        var newData = new FormData();
+        newData.append('firstName', firstName);
+        newData.append('lastName', lastName);
+        newData.append('email', email);
+        newData.append('password', password);
+        newData.append('avatar', isFileChange?files[0]:avatar);
+        newData.append('card_name', nameCardHolder);
+        newData.append('card_number', cardNumber);
+        newData.append('cvc', cardCSV);
+        newData.append('expiry_date', new Date(cardExpire));
+        newData.append('isFileChange', isFileChange);
+        newData.append('isChangedPassword', isChangedPassword);
+
+
+        var config = {
+          method: 'put',
+          url: `http://localhost:5000/user/update/${data?.id}`,
+          headers: {},
+          data: newData,
+        };
+
+        axios(config)
+          .then(function (response) {
+            console.log(JSON.stringify(response.data));
+            setActiveStep(activeStep + 1);
+          })
+          .catch(function (error) {
+            if (error.response) {
+              // Request made and server responded
+              alert(error.response?.data?.message);
+            } else if (error.request) {
+              // The request was made but no response was received
+              alert('Something is Wrong!');
+              console.log(error.request);
+            } else {
+              // Something happened in setting up the request that triggered an Error
+              alert('Something is Wrong!');
+              console.log('Error', error.message);
+            }
+          });
+      } else {
+        if (files.length > 0) {
+          var newData = new FormData();
+          newData.append('firstName', firstName);
+          newData.append('lastName', lastName);
+          newData.append('email', email);
+          newData.append('password', password);
+          newData.append('avatar', files[0]);
+          newData.append('card_name', nameCardHolder);
+          newData.append('card_number', cardNumber);
+          newData.append('cvc', cardCSV);
+          newData.append('expiry_date', new Date(cardExpire));
+
+          var config = {
+            method: 'post',
+            url: 'http://localhost:5000/user/add',
+            headers: {},
+            data: newData,
+          };
+
+          axios(config)
+            .then(function (response) {
+              console.log(JSON.stringify(response.data));
+              setActiveStep(activeStep + 1);
+            })
+            .catch(function (error) {
+              if (error.response) {
+                // Request made and server responded
+                alert(error.response?.data?.message);
+              } else if (error.request) {
+                // The request was made but no response was received
+                alert('Something is Wrong!');
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                alert('Something is Wrong!');
+                console.log('Error', error.message);
+              }
+            });
+        } else {
+          alert('Please select image!');
+        }
+      }
     } else {
       setActiveStep(activeStep + 1);
     }
@@ -65,6 +182,7 @@ export default function HorizontalLabelPositionBelowStepper() {
 
   const setUserImage = (e) => {
     fileToDataUri(e.target.files[0]).then((dataUri) => {
+      isEdit ? setIsFileChange(true) : null;
       setURL(dataUri);
       setFiles(e.target.files);
     });
@@ -87,6 +205,7 @@ export default function HorizontalLabelPositionBelowStepper() {
                   }}
                   id="icon-button-file"
                   type="file"
+                  disabled={disabled}
                   onChange={(e) => {
                     setUserImage(e);
                   }}
@@ -103,26 +222,49 @@ export default function HorizontalLabelPositionBelowStepper() {
                   <TextField
                     required
                     id="firstName"
+                    disabled={disabled}
                     label="First Name"
+                    value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                   />
-                  <TextField required id="lastName" label="Last Name" onChange={(e) => setLastName(e.target.value)} />
+                  <TextField
+                    required
+                    id="lastName"
+                    disabled={disabled}
+                    value={lastName}
+                    label="Last Name"
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
                 </Stack>
-                <TextField required id="email" label="Email" onChange={(e) => setEmail(e.target.value)} />
+                <TextField
+                  required
+                  id="email"
+                  label="Email"
+                  disabled={disabled}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
                 <TextField
                   required
                   name="password"
                   label="Password"
-                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={disabled}
+                  value={isEdit ? isChangedPassword?password:'' : password}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    isEdit ? setIsChangedPassword(true) : null
+                    
+
+                  }}
                   type={showPassword ? 'text' : 'password'}
                   InputProps={{
-                    endAdornment: (
+                    endAdornment: !isView ? (
                       <InputAdornment position="end">
                         <IconButton edge="end" onClick={() => setShowPassword(!showPassword)}>
                           <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
                         </IconButton>
                       </InputAdornment>
-                    ),
+                    ) : null,
                   }}
                 />
               </Stack>
@@ -141,9 +283,10 @@ export default function HorizontalLabelPositionBelowStepper() {
                   required
                   id="cardName"
                   label="Name on card"
+                  value={nameCardHolder}
+                  disabled={disabled}
                   fullWidth
                   autoComplete="cc-name"
-                  variant="standard"
                   onChange={(e) => setNameCardHolder(e.target.value)}
                 />
               </Grid>
@@ -152,32 +295,41 @@ export default function HorizontalLabelPositionBelowStepper() {
                   required
                   id="cardNumber"
                   label="Card number"
+                  value={cardNumber}
+                  disabled={disabled}
                   fullWidth
+                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                   autoComplete="cc-number"
-                  variant="standard"
                   onChange={(e) => setCardNumber(e.target.value)}
                 />
               </Grid>
+
               <Grid item xs={12} md={6}>
-                <TextField
-                  required
-                  id="expDate"
-                  label="Expiry date"
-                  fullWidth
-                  autoComplete="cc-exp"
-                  variant="standard"
-                  onChange={(e) => setCardExpire(e.target.value)}
-                />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    // inputFormat="yyyy-MM"
+                    views={['year', 'month']}
+                    renderInput={(props) => <TextField {...props} />}
+                    label="Date"
+                    disabled={disabled}
+                    value={cardExpire}
+                    onChange={(newValue) => {
+                      setCardExpire(newValue);
+                    }}
+                  />
+                </LocalizationProvider>
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   required
                   id="cvv"
                   label="CVV"
+                  value={cardCSV}
+                  disabled={disabled}
+                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                   helperText="Last three digits on signature strip"
                   fullWidth
                   autoComplete="cc-csc"
-                  variant="standard"
                   onChange={(e) => setCardCSV(e.target.value)}
                 />
               </Grid>
@@ -204,11 +356,7 @@ export default function HorizontalLabelPositionBelowStepper() {
         {activeStep === steps.length ? (
           <React.Fragment>
             <Typography variant="h5" gutterBottom>
-              Thank you for your order.
-            </Typography>
-            <Typography variant="subtitle1">
-              Your order number is #2001539. We have emailed your order confirmation, and will send you an update when
-              your order has shipped.
+              User Added Successfully!
             </Typography>
           </React.Fragment>
         ) : (
@@ -221,9 +369,17 @@ export default function HorizontalLabelPositionBelowStepper() {
                 </Button>
               )}
 
-              <Button variant="contained" onClick={handleNext} sx={{ mt: 3, ml: 1 }}>
-                {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
-              </Button>
+              {activeStep === steps.length - 1 ? (
+                isView ? null : (
+                  <Button variant="contained" onClick={handleNext} sx={{ mt: 3, ml: 1 }}>
+                    Submit
+                  </Button>
+                )
+              ) : (
+                <Button variant="contained" onClick={handleNext} sx={{ mt: 3, ml: 1 }}>
+                  Next
+                </Button>
+              )}
             </Box>
           </React.Fragment>
         )}

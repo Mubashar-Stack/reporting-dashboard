@@ -82,7 +82,7 @@ function addUser(req, res) {
         card_name: req.body.card_name,
         card_number: req.body.card_number,
         cvc: req.body.cvc,
-        expiry_date: req.body.expiry_date,
+        expiry_date: new Date(req.body.expiry_date),
       };
 
       ModalUser.addUser(data, (err, response) => {
@@ -109,12 +109,14 @@ function addUser(req, res) {
 function updateUser(req, res) {
   try {
     const userId = req.params.id;
-    if (!req.files && req.body.isFileChange !== 'false') {
-      res.send({
-        status: false,
-        message: "No file uploaded",
-      });
-    } else {
+    // if (req.body.isFileChange !== 'false' ) {
+    //   if (!req.files) {
+    //     res.send({
+    //       status: false,
+    //       message: "No file uploaded",
+    //     });
+    //   }
+    // } else {
 
       let avatar
       if (req.files) {
@@ -133,21 +135,21 @@ function updateUser(req, res) {
         card_name: req.body.card_name,
         card_number: req.body.card_number,
         cvc: req.body.cvc,
-        expiry_date: req.body.expiry_date,
+        expiry_date: new Date(req.body.expiry_date),
       };
 
       if (req.files) {
         data.photo = Math.floor(new Date() / 1000) + "_" + avatar?.name;
       }
-      if (req.body.password) {
+      if (req.body.isChangedPassword) {
         data.password = Hash(req.body.password, config.appSecret).toString();
       }
 
-      if (!req.files) {
-        data.photo = req.body.previousPhoto;
+      if (!req.body.isFileChange) {
+        data.photo = req.body.avatar;
       }
-      if (!req.body.password) {
-        data.password = req.body.previousPassword;
+      if (!req.body.isChangedPassword) {
+        data.password = req.body.password;
       }
 
       ModalUser.updateUser(data, (err, response) => {
@@ -159,7 +161,7 @@ function updateUser(req, res) {
         }
         return res.status(401).send(err);
       });
-    }
+    // }
   } catch (err) {
     res.status(500).send(err.message);
   }

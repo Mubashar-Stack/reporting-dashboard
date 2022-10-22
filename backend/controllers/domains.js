@@ -11,10 +11,9 @@ const config = require("../config/app");
 function getDomainById(req, res) {
   try {
     const DomainId = req.params.id;
-    console.log('DomainId', DomainId); 
+    console.log("DomainId", DomainId);
     ModalDomain.findById(DomainId, (err, response) => {
       if (!err && response) {
-
         return res.json({
           message: "success",
           data: response,
@@ -25,7 +24,7 @@ function getDomainById(req, res) {
         message: "No Domain found.",
       });
     });
-  } catch (e) { }
+  } catch (e) {}
 }
 
 /**
@@ -50,7 +49,7 @@ function getAllDomains(req, res) {
         message: "No domain found.",
       });
     });
-  } catch (e) { }
+  } catch (e) {}
 }
 
 /**
@@ -62,11 +61,11 @@ function getAllDomains(req, res) {
 function addDomain(req, res) {
   try {
     let ads_code = req.files.ads_code;
-    console.log('ads_code', ads_code);
+    console.log("ads_code", ads_code);
     ads_code.mv(
       "./uploads/" + Math.floor(new Date() / 1000) + "_" + ads_code.name
     );
-    console.log('received body', req.body.domainName);
+    console.log("received body", req.body.domainName);
     const data = {
       domainName: req.body.domainName,
       ads_code: Math.floor(new Date() / 1000) + "_" + ads_code.name,
@@ -95,26 +94,46 @@ function addDomain(req, res) {
 function updateDomain(req, res) {
   try {
     const domainId = req.params.id;
-    let ads_code = req.files.ads_code;
-    console.log('ads_code', ads_code.name);
-    ads_code.mv(
-      "./uploads/" + Math.floor(new Date() / 1000) + "_" + ads_code.name
-    );
-
-    const data = {
-      domainId,
-      domainName: req.body.domainName,
-      ads_code: Math.floor(new Date() / 1000) + "_" + ads_code.name
-    };
-    ModalDomain.updateDomain(data, (err, response) => {
-      if (!err && response) {
-        return res.json({
-          message: "Domain Updated successfully!",
-          status: true,
-        });
+    // if (req.body.isFileChange !== 'false' ) {
+    //   if (!req.files) {
+    //     res.send({
+    //       status: false,
+    //       message: "No file uploaded",
+    //     });
+    //   }
+    // } else {
+      let ads_code;
+      if (req.files) {
+        //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
+        ads_code = req.files.ads_code;
+        //Use the mv() method to place the file in the upload directory (i.e. "uploads")
+        ads_code.mv(
+          "./uploads/" + Math.floor(new Date() / 1000) + "_" + ads_code.name
+        );
       }
-      return res.status(401).send(err);
-    });
+      const data = {
+        domainId,
+        domainName: req.body.domainName,
+      };
+
+      if (req.files) {
+        data.ads_code = Math.floor(new Date() / 1000) + "_" + ads_code.name;
+      }
+
+      if (!req.body.isFileChange) {
+        data.photo = req.body.ads_code;
+      }
+
+      ModalDomain.updateDomain(data, (err, response) => {
+        if (!err && response) {
+          return res.json({
+            message: "Domain Updated successfully!",
+            status: true,
+          });
+        }
+        return res.status(401).send(err);
+      });
+    // }
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -133,10 +152,15 @@ function deleteDomain(req, res) {
       }
       return res.status(401).send(err);
     });
-
   } catch (err) {
     res.status(500).send(err.message);
   }
 }
 
-module.exports = { getAllDomains, getDomainById, addDomain, updateDomain, deleteDomain };
+module.exports = {
+  getAllDomains,
+  getDomainById,
+  addDomain,
+  updateDomain,
+  deleteDomain,
+};

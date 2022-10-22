@@ -35,7 +35,7 @@ export default function UserMoreMenu({ row }) {
   const handleDelete = () => {
     var config = {
       method: 'delete',
-      url: `http://localhost:5000/user/delete/${row.id}`,
+      url: `http://localhost:5000/user_domain/delete/${row.id}`,
       headers: {},
     };
     axios(config)
@@ -77,52 +77,7 @@ export default function UserMoreMenu({ row }) {
         }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <MenuItem
-          component={RouterLink}
-          onClick={() => {
-            handleOpenView();
-          }}
-          to="#"
-          sx={{ color: 'text.secondary' }}
-        >
-          <ListItemIcon>
-            <Iconify
-              icon="eva:eye-fill"
-              onClick={() => {
-                handleOpenView();
-              }}
-              width={24}
-              height={24}
-            />
-          </ListItemIcon>
-          <ListItemText
-            primary="View"
-            onClick={() => {
-              handleOpenView();
-            }}
-            primaryTypographyProps={{ variant: 'body2' }}
-          />
-        </MenuItem>
-        <MenuItem sx={{ color: 'text.secondary' }}>
-          <ListItemIcon>
-            <Iconify
-              onClick={() => {
-                handleDelete();
-              }}
-              icon="eva:trash-2-outline"
-              width={24}
-              height={24}
-            />
-          </ListItemIcon>
-          <ListItemText
-            onClick={() => {
-              handleDelete();
-            }}
-            primary="Delete"
-            primaryTypographyProps={{ variant: 'body2' }}
-          />
-        </MenuItem>
+      >    
 
         <MenuItem
           component={RouterLink}
@@ -147,6 +102,26 @@ export default function UserMoreMenu({ row }) {
             onClick={() => {
               handleOpen();
             }}
+            primaryTypographyProps={{ variant: 'body2' }}
+          />
+        </MenuItem>
+
+        <MenuItem sx={{ color: 'text.secondary' }}>
+          <ListItemIcon>
+            <Iconify
+              onClick={() => {
+                handleDelete();
+              }}
+              icon="eva:trash-2-outline"
+              width={24}
+              height={24}
+            />
+          </ListItemIcon>
+          <ListItemText
+            onClick={() => {
+              handleDelete();
+            }}
+            primary="Delete"
             primaryTypographyProps={{ variant: 'body2' }}
           />
         </MenuItem>

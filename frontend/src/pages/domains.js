@@ -31,16 +31,15 @@ import Label from '../components/Label';
 import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
-import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
-import { RegisterForm } from '../sections/@dashboard/user/add';
+import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/domains';
+import { RegisterForm } from '../sections/@dashboard/domains/add';
 
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
-  { id: 'email', label: 'Email', alignRight: false },
-  { id: 'isVerified', label: 'Verified', alignRight: false },
+  { id: 'ads_code', label: 'Ads Code', alignRight: false },
   { id: 'createdAt', label: 'Created At', alignRight: false },
   { id: '' },
 ];
@@ -71,7 +70,7 @@ function applySortFilter(array, comparator, query) {
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.first_name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    return filter(array, (_user) => _user.domainname.toLowerCase().indexOf(query.toLowerCase()) !== -1);
   }
   return stabilizedThis.map((el) => el[0]);
 }
@@ -91,18 +90,18 @@ export default function User() {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [allUsersList, setAllUsersList] = useState([]);
+  const [allDomainList, setAllDomainList] = useState([]);
 
   useEffect(() => {
     let config = {
       method: 'get',
-      url: 'http://localhost:5000/users',
+      url: 'http://localhost:5000/domains',
       headers: {},
     };
     axios(config)
       .then(function (response) {
         console.log(JSON.parse(JSON.stringify(response.data.data)));
-        setAllUsersList(JSON.parse(JSON.stringify(response.data.data)));
+        setAllDomainList(JSON.parse(JSON.stringify(response.data.data)));
 
       })
       .catch(function (error) {
@@ -119,7 +118,7 @@ export default function User() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = allUsersList.map((n) => n.id);
+      const newSelecteds = allDomainList.map((n) => n.id);
       setSelected(newSelecteds);
       return;
     }
@@ -154,9 +153,9 @@ export default function User() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - allUsersList.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - allDomainList.length) : 0;
 
-  const filteredUsers = applySortFilter(allUsersList, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(allDomainList, getComparator(order, orderBy), filterName);
 
   const isUserNotFound = filteredUsers.length === 0;
   const style = {
@@ -176,7 +175,7 @@ export default function User() {
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            User
+            Domains
           </Typography>
           <Button
             variant="contained"
@@ -185,7 +184,7 @@ export default function User() {
             to="#"
             startIcon={<Iconify icon="eva:plus-fill" />}
           >
-            New User
+            New Domain
           </Button>
           <Modal
             open={open}
@@ -215,15 +214,15 @@ export default function User() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={allUsersList.length}
+                  rowCount={allDomainList.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, first_name, last_name, photo, email, enabled, create_at } = row;
-                    const isItemSelected = selected.indexOf(first_name) !== -1;
+                    const { id, domainname, ads_code, created_at } = row;
+                    const isItemSelected = selected.indexOf(domainname) !== -1;
 
                     return (
                       <TableRow
@@ -239,17 +238,14 @@ export default function User() {
                         </TableCell>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={name} src={`http://localhost:5000/${photo}`} />
                             <Typography variant="subtitle2" noWrap>
-                              {`${first_name} ${last_name}`}
+                              {`${domainname}`}
                             </Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell align="left">{email}</TableCell>
-                        {/* <TableCell align="left">{role}</TableCell> */}
-                        <TableCell align="left">{enabled ? 'Yes' : 'No'}</TableCell>
+                        <TableCell align="left">{ads_code.split('_')[1]}</TableCell>
                         <TableCell align="left">
-                        {new Date(create_at).toString()}
+                        {new Date(created_at).toString()}
                         </TableCell>
 
                         <TableCell align="right">
@@ -281,7 +277,7 @@ export default function User() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={allUsersList.length}
+            count={allDomainList.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

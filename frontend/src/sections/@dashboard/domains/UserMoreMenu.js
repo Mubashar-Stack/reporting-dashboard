@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
@@ -8,6 +9,7 @@ import { styled } from '@mui/material/styles';
 
 import Iconify from '../../../components/Iconify';
 import { RegisterForm } from './add';
+import axios from 'axios';
 
 // ----------------------------------------------------------------------
 
@@ -18,8 +20,8 @@ const ContentStyle = styled('div')(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   flexDirection: 'column',
-  padding: theme.spacing(12, 12),
-  margin: theme.spacing(5, 0),
+  padding: theme.spacing(4, 12),
+  margin: theme.spacing(3, 0),
   backgroundColor: '#fff',
 }));
 
@@ -28,13 +30,35 @@ export default function UserMoreMenu({ row }) {
   const [isOpen, setIsOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [isView, setIsView] = useState(false);
+
+  const handleDelete = () => {
+    var config = {
+      method: 'delete',
+      url: `http://localhost:5000/domain/delete/${row.id}`,
+      headers: {},
+    };
+    axios(config)
+      .then(function (response) {
+        window.location.reload();
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
 
   const handleOpen = () => {
     setIsEdit(true);
     setOpen(true);
   };
+
+  const handleOpenView = () => {
+    setIsView(true);
+    setOpen(true);
+  };
   const handleClose = () => {
     setIsEdit(false);
+    setIsView(false);
     setOpen(false);
   };
 
@@ -56,10 +80,52 @@ export default function UserMoreMenu({ row }) {
       >
         <MenuItem sx={{ color: 'text.secondary' }}>
           <ListItemIcon>
-            <Iconify icon="eva:trash-2-outline" width={24} height={24} />
+            <Iconify
+              icon="eva:download-fill"
+              onClick={() => {
+                const link = `http://localhost:5000/${row.ads_code}`;
+                window.open(link);
+              }}
+              width={24}
+              height={24}
+            />
           </ListItemIcon>
-          <ListItemText primary="Delete" primaryTypographyProps={{ variant: 'body2' }} />
+          <ListItemText
+            primary="Download"
+            onClick={() => {
+              const link = `http://localhost:5000/${row.ads_code}`;
+              window.open(link);
+            }}
+            primaryTypographyProps={{ variant: 'body2' }}
+          />
         </MenuItem>
+        <MenuItem
+          component={RouterLink}
+          onClick={() => {
+            handleOpenView();
+          }}
+          to="#"
+          sx={{ color: 'text.secondary' }}
+        >
+          <ListItemIcon>
+            <Iconify
+              icon="eva:eye-fill"
+              onClick={() => {
+                handleOpenView();
+              }}
+              width={24}
+              height={24}
+            />
+          </ListItemIcon>
+          <ListItemText
+            primary="View"
+            onClick={() => {
+              handleOpenView();
+            }}
+            primaryTypographyProps={{ variant: 'body2' }}
+          />
+        </MenuItem>
+       
 
         <MenuItem
           component={RouterLink}
@@ -87,6 +153,26 @@ export default function UserMoreMenu({ row }) {
             primaryTypographyProps={{ variant: 'body2' }}
           />
         </MenuItem>
+
+        <MenuItem sx={{ color: 'text.secondary' }}>
+          <ListItemIcon>
+            <Iconify
+              onClick={() => {
+                handleDelete();
+              }}
+              icon="eva:trash-2-outline"
+              width={24}
+              height={24}
+            />
+          </ListItemIcon>
+          <ListItemText
+            onClick={() => {
+              handleDelete();
+            }}
+            primary="Delete"
+            primaryTypographyProps={{ variant: 'body2' }}
+          />
+        </MenuItem>
       </Menu>
       <Modal
         open={open}
@@ -94,17 +180,7 @@ export default function UserMoreMenu({ row }) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Container maxWidth="sm">
-          <ContentStyle>
-            <Typography variant="h4" gutterBottom>
-             {isEdit ? 'Edit User' : 'Add New User'}
-            </Typography>
-
-            <Typography sx={{ color: 'text.secondary', mb: 5 }}>Enter your details below.</Typography>
-
-            <RegisterForm />
-          </ContentStyle>
-        </Container>
+        <RegisterForm isEdit={isEdit} isView={isView} data={row} />
       </Modal>
     </>
   );

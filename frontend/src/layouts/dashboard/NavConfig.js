@@ -22,8 +22,13 @@ const navConfig = [
     icon: getIcon('eva:alert-triangle-fill'),
   },
   {
-    title: 'Add Code',
-    path: '/dashboard/addcode',
+    title: 'Domains',
+    path: '/dashboard/domains',
+    icon: getIcon('eva:alert-triangle-fill'),
+  },
+  {
+    title: 'Users Domains',
+    path: '/dashboard/usersDomains',
     icon: getIcon('eva:alert-triangle-fill'),
   },
 ];
