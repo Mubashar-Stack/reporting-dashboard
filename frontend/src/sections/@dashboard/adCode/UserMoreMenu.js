@@ -18,8 +18,8 @@ const ContentStyle = styled('div')(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   flexDirection: 'column',
-  padding: theme.spacing(4, 12),
-  margin: theme.spacing(3, 0),
+  padding: theme.spacing(12, 12),
+  margin: theme.spacing(5, 0),
   backgroundColor: '#fff',
 }));
 
@@ -28,21 +28,13 @@ export default function UserMoreMenu({ row }) {
   const [isOpen, setIsOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
-  const [isView, setIsView] = useState(false);
-
 
   const handleOpen = () => {
     setIsEdit(true);
     setOpen(true);
   };
-  
-  const handleOpenView = () => {
-    setIsView(true);
-    setOpen(true);
-  };
   const handleClose = () => {
     setIsEdit(false);
-    setIsView(false)
     setOpen(false);
   };
 
@@ -62,32 +54,6 @@ export default function UserMoreMenu({ row }) {
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem
-          component={RouterLink}
-          onClick={() => {
-            handleOpenView();
-          }}
-          to="#"
-          sx={{ color: 'text.secondary' }}
-        >
-          <ListItemIcon>
-            <Iconify
-              icon="eva:eye-fill"
-              onClick={() => {
-                handleOpenView();
-              }}
-              width={24}
-              height={24}
-            />
-          </ListItemIcon>
-          <ListItemText
-            primary="View"
-            onClick={() => {
-              handleOpenView();
-            }}
-            primaryTypographyProps={{ variant: 'body2' }}
-          />
-        </MenuItem>
         <MenuItem sx={{ color: 'text.secondary' }}>
           <ListItemIcon>
             <Iconify icon="eva:trash-2-outline" width={24} height={24} />
@@ -128,7 +94,17 @@ export default function UserMoreMenu({ row }) {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <RegisterForm isEdit={isEdit} isView={isView} data={row} />
+        <Container maxWidth="sm">
+          <ContentStyle>
+            <Typography variant="h4" gutterBottom>
+             {isEdit ? 'Edit User' : 'Add New User'}
+            </Typography>
+
+            <Typography sx={{ color: 'text.secondary', mb: 5 }}>Enter your details below.</Typography>
+
+            <RegisterForm />
+          </ContentStyle>
+        </Container>
       </Modal>
     </>
   );

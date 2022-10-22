@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
@@ -8,6 +9,7 @@ import { styled } from '@mui/material/styles';
 
 import Iconify from '../../../components/Iconify';
 import { RegisterForm } from './add';
+import axios from 'axios';
 
 // ----------------------------------------------------------------------
 
@@ -26,24 +28,20 @@ const ContentStyle = styled('div')(({ theme }) => ({
 export default function UserMoreMenu({ row }) {
   const ref = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
-  const [isView, setIsView] = useState(false);
 
-
-  const handleOpen = () => {
-    setIsEdit(true);
-    setOpen(true);
-  };
-  
-  const handleOpenView = () => {
-    setIsView(true);
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setIsEdit(false);
-    setIsView(false)
-    setOpen(false);
+  const handleDelete = () => {
+    var config = {
+      method: 'delete',
+      url: `http://localhost:5000/reports/delete/${row.id}`,
+      headers: {},
+    };
+    axios(config)
+      .then(function (response) {
+        window.location.reload();
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
 
   return (
@@ -62,74 +60,48 @@ export default function UserMoreMenu({ row }) {
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem
-          component={RouterLink}
-          onClick={() => {
-            handleOpenView();
-          }}
-          to="#"
-          sx={{ color: 'text.secondary' }}
-        >
+        <MenuItem sx={{ color: 'text.secondary' }}>
           <ListItemIcon>
             <Iconify
-              icon="eva:eye-fill"
               onClick={() => {
-                handleOpenView();
+                handleDelete();
               }}
+              icon="eva:trash-2-outline"
               width={24}
               height={24}
             />
           </ListItemIcon>
           <ListItemText
-            primary="View"
             onClick={() => {
-              handleOpenView();
+              handleDelete();
             }}
+            primary="Delete"
             primaryTypographyProps={{ variant: 'body2' }}
           />
         </MenuItem>
+
         <MenuItem sx={{ color: 'text.secondary' }}>
           <ListItemIcon>
-            <Iconify icon="eva:trash-2-outline" width={24} height={24} />
-          </ListItemIcon>
-          <ListItemText primary="Delete" primaryTypographyProps={{ variant: 'body2' }} />
-        </MenuItem>
-
-        <MenuItem
-          component={RouterLink}
-          onClick={() => {
-            handleOpen();
-          }}
-          to="#"
-          sx={{ color: 'text.secondary' }}
-        >
-          <ListItemIcon>
             <Iconify
-              icon="eva:edit-fill"
+              icon="eva:download-fill"
               onClick={() => {
-                handleOpen();
+                const link = `http://localhost:5000/${row.file}`;
+                window.open(link);
               }}
               width={24}
               height={24}
             />
           </ListItemIcon>
           <ListItemText
-            primary="Edit"
+            primary="Download"
             onClick={() => {
-              handleOpen();
+              const link = `http://localhost:5000/${row.file}`;
+              window.open(link);
             }}
             primaryTypographyProps={{ variant: 'body2' }}
           />
         </MenuItem>
       </Menu>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <RegisterForm isEdit={isEdit} isView={isView} data={row} />
-      </Modal>
     </>
   );
 }

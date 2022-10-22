@@ -3,6 +3,7 @@ import { sentenceCase } from 'change-case';
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
+import { styled } from '@mui/material/styles';
 import {
   Card,
   Table,
@@ -29,6 +30,8 @@ import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
+import { RegisterForm } from '../sections/@dashboard/user/add';
+
 // mock
 import USERLIST from '../_mock/user';
 
@@ -43,6 +46,17 @@ const TABLE_HEAD = [
   { id: '' },
 ];
 
+const ContentStyle = styled('div')(({ theme }) => ({
+  maxWidth: 480,
+  // margin: 'auto',
+  minHeight: '70vh',
+  display: 'flex',
+  justifyContent: 'center',
+  flexDirection: 'column',
+  padding: theme.spacing(4, 12),
+  margin: theme.spacing(3, 0),
+  backgroundColor: '#fff',
+}));
 // ----------------------------------------------------------------------
 
 function descendingComparator(a, b, orderBy) {
@@ -139,10 +153,10 @@ export default function User() {
   const isUserNotFound = filteredUsers.length === 0;
   const style = {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 500,
+    top: '40%',
+    left: '40%',
+    transform: 'translate(-40%, -40%)',
+    // width: 500,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
@@ -171,17 +185,15 @@ export default function User() {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-            <form>
-              <Box sx={style} display="flex" flexDirection="column">
-                <FormControl spacing={20}>
-                  <TextField id="first_name" label="First Name" variant="outlined" />
-                  <TextField id="last_name" label="Last Name" variant="outlined" />
-                  <TextField id="email" label="Email" variant="outlined" type="email" />
-                  <TextField id="password" label="Password" variant="outlined" type="password" />
-                </FormControl>
-                <Button> Submit</Button>
-              </Box>
-            </form>
+            {/* <Box sx={{ ...style, width: '50%',}}>
+              <Typography variant="h4" gutterBottom>
+                Add New User
+              </Typography>
+
+              <Typography sx={{ color: 'text.secondary', mb: 5 }}>Enter your details below.</Typography> */}
+
+              <RegisterForm />
+            {/* </Box> */}
           </Modal>
         </Stack>
 
@@ -235,7 +247,7 @@ export default function User() {
                         </TableCell>
 
                         <TableCell align="right">
-                          <UserMoreMenu />
+                          <UserMoreMenu row={row} />
                         </TableCell>
                       </TableRow>
                     );

@@ -3,6 +3,7 @@ import { sentenceCase } from 'change-case';
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
+import { styled } from '@mui/material/styles';
 import {
   Card,
   Table,
@@ -19,11 +20,6 @@ import {
   TablePagination,
   TextField,
   FormControl,
-  MenuItem,
-  Select,
-  InputLabel,
-  TextareaAutosize,
-  Autocomplete,
 } from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -34,6 +30,8 @@ import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
+import { RegisterForm } from '../sections/@dashboard/user/add';
+
 // mock
 import USERLIST from '../_mock/user';
 
@@ -48,6 +46,18 @@ const TABLE_HEAD = [
   { id: '' },
 ];
 
+
+const ContentStyle = styled('div')(({ theme }) => ({
+  maxWidth: 480,
+  // margin: 'auto',
+  minHeight: '70vh',
+  display: 'flex',
+  justifyContent: 'center',
+  flexDirection: 'column',
+  padding: theme.spacing(12, 12),
+  margin: theme.spacing(5, 0),
+  backgroundColor: '#fff'
+}));
 // ----------------------------------------------------------------------
 
 function descendingComparator(a, b, orderBy) {
@@ -79,7 +89,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function AddCode() {
+export default function User() {
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -153,18 +163,13 @@ export default function AddCode() {
     boxShadow: 24,
     p: 10,
   };
-  const [id, setId] = useState('');
 
-  const handleChange = (event) => {
-    setId(event.target.value);
-  };
-  const top100Films = [{ label: '1' }, { label: '2' }, { label: '3' }];
   return (
-    <Page title="AddCode">
+    <Page title="User">
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Add Code
+            User
           </Typography>
           <Button
             variant="contained"
@@ -181,21 +186,18 @@ export default function AddCode() {
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
           >
-            <form>
-              <Box sx={style}>
-                <FormControl>
-                  <Autocomplete
-                    style={{ marginBottom: '20px' }}
-                    disablePortal
-                    id="combo-box-demo"
-                    options={top100Films}
-                    sx={{ width: 300 }}
-                    renderInput={(params) => <TextField {...params} label="User id" />}
-                  />
-                  <TextareaAutosize minRows={6} style={{ width: 400 }} />
-                </FormControl>
-              </Box>
-            </form>
+            <Container maxWidth="sm">
+              <ContentStyle>
+                <Typography variant="h4" gutterBottom>
+                  Add New User
+                </Typography>
+
+                <Typography sx={{ color: 'text.secondary', mb: 5 }}>Enter your details below.</Typography>
+
+
+                <RegisterForm />
+              </ContentStyle>
+            </Container>
           </Modal>
         </Stack>
 
@@ -249,7 +251,7 @@ export default function AddCode() {
                         </TableCell>
 
                         <TableCell align="right">
-                          <UserMoreMenu />
+                          <UserMoreMenu row={row} />
                         </TableCell>
                       </TableRow>
                     );

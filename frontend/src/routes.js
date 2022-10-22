@@ -10,25 +10,31 @@ import NotFound from './pages/Page404';
 import Register from './pages/Register';
 import Products from './pages/Products';
 import DashboardApp from './pages/DashboardApp';
+import UploadReports from './pages/uploadReports';
+
 import AddCode from './pages/AddCode';
 
 // ----------------------------------------------------------------------
 
 export default function Router({ isLoggedIn }) {
-  console.log('============isLoggedIn========================');
-  console.log(isLoggedIn);
-  console.log('====================================');
+ 
 
   return useRoutes([
     {
       path: '/dashboard',
-      element: isLoggedIn ? <DashboardLayout /> : <Navigate to="/login" />,
+      element: isLoggedIn ==='admin' ? <DashboardLayout /> : <Navigate to="/login" />,
       children: [
         { path: 'app', element: <DashboardApp /> },
         { path: 'user', element: <User /> },
-        { path: 'products', element: <Products /> },
-        { path: 'blog', element: <Blog /> },
+        { path: 'uploadReports', element: <UploadReports /> },
         { path: 'addcode', element: <AddCode /> },
+      ],
+    },
+    {
+      path: '/customerDashboard',
+      element: isLoggedIn ==='user' ? <DashboardLayout /> : <Navigate to="/login" />,
+      children: [
+        { path: 'app', element: <DashboardApp /> },
       ],
     },
     {

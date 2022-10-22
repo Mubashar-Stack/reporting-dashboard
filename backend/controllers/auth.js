@@ -11,7 +11,7 @@ const Hash = require('crypto-js/pbkdf2');
 */
 function login(req, res) {
     
-    db_read.query('SELECT id, email, password FROM users where email = ?', [req.body.email], (err, response, fields) => {
+    db_read.query('SELECT id, email, password,type FROM users where email = ?', [req.body.email], (err, response, fields) => {
         if(!err && response.length === 1){
             const user = response[0];
             
@@ -28,6 +28,8 @@ function login(req, res) {
                 
                 res.json({
                     message: "success",
+                    status:true,
+                    type:user.type,
                     data: jwt.sign(sign, config.jwtSecret)
                 });
             }

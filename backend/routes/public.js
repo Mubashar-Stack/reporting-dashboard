@@ -19,6 +19,10 @@ router.route("/user/delete/:id").delete(users.deleteUser);
 
 
 router.route("/reports/new").post(reports.addReport);
+router.route("/reports/all").get(reports.getAllFiles);
+router.route("/reports/delete/:id").delete(reports.deleteFile);
+
+
 
 
 module.exports = router;

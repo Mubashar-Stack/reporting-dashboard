@@ -10,38 +10,64 @@ const Report = (data) => {
   this.Ad_Impressions = data.Ad_Impressions;
   this.Revenue = data.Revenue;
   this.eCPM = data.eCPM;
+  this.commission=data.commission;
   this.created_at = data.create_at;
   this.updated_at = data.updated_at;
 };
 
 
 Report.addReport = function addReport(data, result) {
-  data.map(async (input) => {
-    let singleRow = {
-      Domain_name: input.Domain_name,
-      Ad_Requests: input.Ad_Requests,
-      Ad_Impressions: input.Ad_Impressions,
-      Revenue: input.Revenue,
-      eCPM: input.eCPM,
-      create_at: input.create_at,
-      updated_at: input.updated_at,
-    };
 
-    console.log(singleRow,"singleRow");
-
-    // db_write.query("INSERT INTO reports SET ? ", [data], function (err, res) {
-    //   if (err) {
-    //     console.log("error: ", err);
-    //     result(err, null);
-    //   } else {
-    //     result(null, res);
-    //   }
-    // });
-
-
+  
+ 
+  db_write.query("INSERT INTO reports (Domain_name, Ad_Requests, Ad_Impressions,Revenue,commission,create_at,updated_at) VALUES ? ", [data.map(item => [item.Domain_name, item.Ad_Requests, item.Ad_Impressions,item.Revenue,item.commission,item.create_at,item.updated_at])], function (err, res) {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
   });
 
  
+};
+
+Report.getFiles = function getFiles(result) {
+  db_read.query("SELECT * FROM `files` ORDER BY id DESC", function (err, res) {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+    } else {
+      result(null, res);
+    }
+  });
+};
+
+
+
+Report.deleteFile = function deleteFile(id, result) {
+  db_read.query(
+    "SELECT id, file FROM files where id = ?",
+    [id],
+    (err, response, fields) => {
+      if (!err && response.length === 1) {
+        db_write.query(
+          "DELETE FROM files WHERE id=?",
+          [id],
+          function (err, res) {
+            if (err) {
+              console.log("error: ", err);
+              result(err, null);
+            } else {
+              result(null, res);
+            }
+          }
+        );
+      } else {
+        result({ error: "deletions Failed!", message: "File Not Found " });
+      }
+    }
+  );
 };
 
 module.exports = Report;

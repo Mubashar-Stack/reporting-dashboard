@@ -1,6 +1,31 @@
 const ModalReport = require("../models/report");
 const csv = require("fast-csv");
 const fs = require("fs");
+const { db_read, db_write } = require("../config/db");
+
+/**
+ * Returns User List if found in db
+ * @param req
+ * @param res
+ * @returns {*}
+ */
+ function getAllFiles(req, res) {
+  try {
+
+    ModalReport.getFiles((err, response) => {
+      if (!err && response) {
+        return res.json({
+          message: "success",
+          data: response,
+        });
+      }
+      return res.status(401).send({
+        error: "Not Found",
+        message: "No user found.",
+      });
+    });
+  } catch (e) {}
+}
 
 /**
  * @param req
@@ -31,8 +56,25 @@ function addReport(req, res) {
       );
 
       let rows = [];
+     
+
+      const data = {
+        file: Math.floor(new Date() / 1000) + "_" + report.name,
+        commission: req.body.commission,
+        create_at: new Date(req.body.date),
+        updated_at: new Date(req.body.date),
+      };
+
+      db_write.query("INSERT INTO files SET ? ", [data], function (err, res) {
+        if (err) {
+          console.log("error: ", err);
+        } else {
+          console.log("error: ", res);
+        }
+      });
+      
       let path =
-        "./uploads/" + Math.floor(new Date() / 1000) + "_" + report.name;
+      "./uploads/" + Math.floor(new Date() / 1000) + "_" + report.name;
 
       fs.createReadStream(path)
         .pipe(csv.parse({ headers: true }))
@@ -46,9 +88,10 @@ function addReport(req, res) {
             Ad_Impressions: row["Ad Impressions"],
             Revenue: row["Revenue (USD)"],
             eCPM: row["eCPM"],
+            commission: req.body.commission,
             create_at: new Date(req.body.date),
             updated_at: new Date(req.body.date),
-          }
+          };
           rows.push(final_row);
         })
         .on("end", () => {
@@ -61,7 +104,6 @@ function addReport(req, res) {
             }
             return res.status(401).send(err);
           });
-          
         });
     }
   } catch (err) {
@@ -69,4 +111,24 @@ function addReport(req, res) {
   }
 }
 
-module.exports = { addReport };
+
+function deleteFile(req, res) {
+  try {
+    const fileId = req.params.id;
+
+    ModalReport.deleteFile(fileId, (err, response) => {
+        if (!err && response) {
+          return res.json({
+            message: "File Deleted successfully!",
+            status: true,
+          });
+        }
+        return res.status(401).send(err);
+      });
+   
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
+
+module.exports = { addReport, getAllFiles,deleteFile };
