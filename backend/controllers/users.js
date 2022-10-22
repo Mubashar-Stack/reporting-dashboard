@@ -79,6 +79,10 @@ function addUser(req, res) {
         photo: Math.floor(new Date() / 1000) + "_" + avatar.name,
         email: req.body.email,
         password: Hash(req.body.password, config.appSecret).toString(),
+        card_name: req.body.card_name,
+        card_number: req.body.card_number,
+        cvc: req.body.cvc,
+        expiry_date: req.body.expiry_date,
       };
 
       ModalUser.addUser(data, (err, response) => {
@@ -112,9 +116,10 @@ function updateUser(req, res) {
       });
     } else {
 
+      let avatar
       if (req.files) {
         //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
-        let avatar = req.files.avatar;
+        avatar = req.files.avatar;
         //Use the mv() method to place the file in the upload directory (i.e. "uploads")
         avatar.mv(
           "./uploads/" + Math.floor(new Date() / 1000) + "_" + avatar.name
@@ -125,6 +130,10 @@ function updateUser(req, res) {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
+        card_name: req.body.card_name,
+        card_number: req.body.card_number,
+        cvc: req.body.cvc,
+        expiry_date: req.body.expiry_date,
       };
 
       if (req.files) {
@@ -141,7 +150,7 @@ function updateUser(req, res) {
         data.password = req.body.previousPassword;
       }
 
-      ModalUser.addUser(data, (err, response) => {
+      ModalUser.updateUser(data, (err, response) => {
         if (!err && response) {
           return res.json({
             message: "User Updated successfully!",
