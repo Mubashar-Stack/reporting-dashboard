@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import {
   Card,
   Table,
@@ -30,6 +31,8 @@ import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
+import { RegisterForm } from '../sections/@dashboard/user/add';
+
 import { RegisterForm } from '../sections/@dashboard/user/add';
 
 // mock

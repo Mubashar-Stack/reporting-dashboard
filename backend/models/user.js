@@ -8,6 +8,10 @@ const User = (data) => {
   this.username = data.username;
   this.email = data.email;
   this.password = data.password;
+  this.card_name = data.card_name;
+  this.card_number = data.card_number;
+  this.cvc = data.cvc;
+  this.expiry_date = data.expiry_date;
   this.created_at = new Date();
   this.updated_at = new Date();
 };
@@ -49,6 +53,10 @@ User.addUser = function addUser(input, result) {
     email: input.email,
     enabled: 1,
     password: input.password,
+    card_name: input.card_name,
+    card_number: input.card_number,
+    cvc: input.cvc,
+    expiry_date: input.expiry_date,
     create_at: currentDate,
     updated_at: currentDate,
   };
@@ -92,6 +100,10 @@ User.updateUser = function updateUser(input, result) {
     (err, response, fields) => {
       if (!err && response.length === 1) {
         console.log(response);
+        data.card_name = input.card_name ? input.card_name : response[0].card_name
+        data.card_number = input.card_number ? input.card_number : response[0].card_number
+        data.cvc = input.cvc ? input.cvc : response[0].cvc
+        data.expiry_date = input.expiry_date ? input.expiry_date : response[0].expiry_date
         db_write.query(
           "UPDATE users SET ? WHERE id=?",
           [data, input.userId],
