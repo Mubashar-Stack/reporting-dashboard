@@ -50,7 +50,7 @@ Report.getReports = async function getReports(filter, result) {
     console.log('filter', filter);
     const filterArray = filter.Domain_name.length>0 ? [filter.Domain_name, filter.start_date, filter.end_date] : [filter.start_date, filter.end_date] 
     console.log('filterArray', filterArray);
-    db_read.query("SELECT * FROM `reports` where " +(filter.Domain_name.length>0? "Domain_name = ? and ": "")+"create_at >= ? and create_at <= ? ORDER BY id DESC", filterArray, function (err, res) {
+    db_read.query("SELECT * FROM `reports` where " +(filter.Domain_name.length>0? "Domain_name = ? and ": "")+"create_at >= ? and create_at <= ? + interval 1 DAY ORDER BY id DESC", filterArray, function (err, res) {
       if (err) {
         console.log("error: ", err);
         resolve(result(err, null));
