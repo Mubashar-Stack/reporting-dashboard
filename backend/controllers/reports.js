@@ -33,6 +33,118 @@ const { db_read, db_write } = require("../config/db");
  * @returns {*}
  */
 
+
+ async function getHomeStats(req, res) {
+  try {
+    const {domain_name, start_date, end_date} = req.query
+    let responseArray = []
+    let currentMonthRevenue= {revenue: 0, calculatedRevenue: 0}
+    let lastMonthRevenue= {revenue: 0, calculatedRevenue: 0}
+    console.log(domain_name, start_date, end_date);
+    const data = {
+      Domain_name: domain_name? domain_name :"",
+      start_date: start_date? start_date : "",
+      end_date: end_date? end_date : ""
+    }
+    /*
+    alternate code if asked to not calculate cur and last month revenue in every call
+    ModalReport.getReports(data, (err, response) => {
+      if (!err && response) {
+        // console.log('response', response);
+
+        response.map(respons =>{
+          console.log('respons', respons);
+          //we can round this value if req arises i.e Math.round(respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission))))
+          respons.Calculated_Ad_Requests = respons.Ad_Requests - respons.Ad_Requests*(parseFloat(("0."+respons.commission)))
+          respons.Calculated_Ad_Impressions = respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission)))
+          respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+
+        })
+
+        return res.json({
+          message: "success",
+          data: response,
+        });
+      }
+      return res.status(401).send({
+        error: "Not Found",
+        message: "No user found.",
+      });
+    });
+    */
+    await ModalReport.getReports(data, async (err, response) => {
+      if (!err && response) {
+        // console.log('response', response);
+
+        await Promise.all(
+          response.map(respons =>{
+            console.log('respons', respons);
+            //we can round this value if req arises i.e Math.round(respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission))))
+            respons.Calculated_Ad_Requests = respons.Ad_Requests - respons.Ad_Requests*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Ad_Impressions = respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+  
+          })
+        )
+        responseArray = response
+
+        // return res.json({
+        //   message: "success",
+        //   data: response,
+        // });
+      }
+      // return res.status(401).send({
+      //   error: "Not Found",
+      //   message: "No user found.",
+      // });
+    });
+
+
+    let date = new Date();
+    let firstDayOfCurrentMonth = new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0];
+    let lastDayLastDayOfCurrentMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString().split('T')[0];
+
+    await ModalReport.getReports({Domain_name: "", start_date: firstDayOfCurrentMonth, end_date: lastDayLastDayOfCurrentMonth}, async (err, response) => {
+      if (!err && response) {
+        // console.log('response', response);
+
+        await Promise.all(
+          response.map(respons =>{
+            console.log('respons', respons);
+            respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+            currentMonthRevenue.revenue += respons.Revenue
+            currentMonthRevenue.calculatedRevenue += respons.Calculated_Revenue
+          })
+        )
+      }
+    });
+
+    let firstDayOfLastMonth = new Date(date.getFullYear(), date.getMonth()-1, 1).toISOString().split('T')[0];
+    let lastDayLastDayOfLastMonth = new Date(date.getFullYear(), date.getMonth() , 0).toISOString().split('T')[0];
+
+    await ModalReport.getReports({Domain_name: "", start_date: firstDayOfLastMonth, end_date: lastDayLastDayOfLastMonth}, async (err, response) => {
+      console.log('err :/'. err);
+      if (!err && response) {
+        console.log('response', response);
+
+        await Promise.all(
+          response.map(respons =>{
+            console.log('respons', respons);
+            respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+            lastMonthRevenue.revenue += respons.Revenue
+            lastMonthRevenue.calculatedRevenue += respons.Calculated_Revenue
+          })
+        )
+      }
+    });
+
+    return res.json({
+      message: "success",
+      data: {response: responseArray, currentMonthRevenue, lastMonthRevenue},
+    });
+  } catch (e) {}
+}
+
 function addReport(req, res) {
   try {
     if (!req.files) {
@@ -131,4 +243,4 @@ function deleteFile(req, res) {
   }
 }
 
-module.exports = { addReport, getAllFiles,deleteFile };
+module.exports = { addReport, getAllFiles,deleteFile, getHomeStats };

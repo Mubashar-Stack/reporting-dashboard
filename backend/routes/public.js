@@ -39,6 +39,9 @@ router.route("/reports/new").post(reports.addReport);
 router.route("/reports/all").get(reports.getAllFiles);
 router.route("/reports/delete/:id").delete(reports.deleteFile);
 
+router.route("/homeStats").get(reports.getHomeStats);
+
+
 
 
 
