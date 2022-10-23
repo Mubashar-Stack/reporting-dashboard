@@ -55,18 +55,11 @@ export default function LoginForm() {
     axios(config)
       .then(function (response) {
         const result = JSON.parse(JSON.stringify(response.data));
-        console.log(result,result?.data,result?.type);
-        try {
-          window.localStorage.setItem('token', result?.data);
-          window.localStorage.setItem('type', result?.type);
-        } catch (err) {
-          console.log(err);
-        }
-        if (result?.type == 'admin') {
-          navigate('/dashboard/app', { replace: true });
-        } else {
-          navigate('/customerDashboard/app', { replace: true });
-        }
+        console.log(result, result?.data, result?.type);
+        window.localStorage.setItem('token', result?.data);
+        window.localStorage.setItem('type', result?.type);
+        navigate(result?.type == 'admin'?'/dashboard/app':'/customerDashboard/app', { replace: true });
+       
       })
       .catch(function (error) {
         console.log(error);

@@ -9,13 +9,13 @@ import { BaseOptionChartStyle } from './components/chart/BaseOptionChart';
 // ----------------------------------------------------------------------
 
 export default function App() {
-  const isLoggedIn  = window.localStorage.getItem('type');
+ 
  
   return (
     <ThemeProvider>
       <ScrollToTop />
       <BaseOptionChartStyle />
-      <Router isLoggedIn={isLoggedIn} />
+      <Router/>
     </ThemeProvider>
   );
 }

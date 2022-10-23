@@ -2,6 +2,8 @@ import { Navigate, useRoutes } from 'react-router-dom';
 // layouts
 import DashboardLayout from './layouts/dashboard';
 import LogoOnlyLayout from './layouts/LogoOnlyLayout';
+import CustomerDashboard from './layouts/customerDashboard';
+
 //
 
 import User from './pages/User';
@@ -18,8 +20,9 @@ import UsersDomains from './pages/users_domains';
 
 // ----------------------------------------------------------------------
 
-export default function Router({ isLoggedIn }) {
- 
+export default function Router() {
+  
+  const isLoggedIn  = window.localStorage.getItem('type');
 
   return useRoutes([
     {
@@ -35,7 +38,7 @@ export default function Router({ isLoggedIn }) {
     },
     {
       path: '/customerDashboard',
-      element: isLoggedIn ==='user' ? <DashboardLayout /> : <Navigate to="/login" />,
+      element: isLoggedIn ==='user' ? <CustomerDashboard /> : <Navigate to="/login" />,
       children: [
         { path: 'app', element: <DashboardApp /> },
       ],
@@ -52,7 +55,7 @@ export default function Router({ isLoggedIn }) {
       path: '/',
       element: <LogoOnlyLayout />,
       children: [
-        { path: '/', element: <Navigate to="/dashboard/app" /> },
+        { path: '/', element: isLoggedIn ==='admin' ? <Navigate to="/dashboard/app" />  : <Navigate to="/customerDashboard/app" /> },
         { path: '404', element: <NotFound /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],
