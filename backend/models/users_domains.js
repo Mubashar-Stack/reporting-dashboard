@@ -26,17 +26,21 @@ UserDomain.findById = function getUserDomainById(userDomainId, result) {
 };
 
 UserDomain.getUserDomainsById = function getUserDomainByUserId(user_id, result) {
-  db_read.query(
-    "Select * from users_domains where user_id = ?", user_id,
-    function (err, res) {
-      if (err) {
-        console.log("error: ", err);
-        result(err, null);
-      } else {
-        result(null, res);
+  return new Promise(async (resolve) => {
+
+    db_read.query(
+      "Select * from users_domains where user_id = ?", user_id,
+      function (err, res) {
+        if (err) {
+          console.log("error: ", err);
+          resolve(result(err, null));
+        } else {
+          resolve(result(null, res));
+        }
       }
-    }
-  );
+    );
+  });
+
 };
 
 UserDomain.getUserDomains = function getAllUserDomains(result) {

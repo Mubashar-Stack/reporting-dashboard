@@ -40,6 +40,7 @@ router.route("/reports/all").get(reports.getAllFiles);
 router.route("/reports/delete/:id").delete(reports.deleteFile);
 
 router.route("/homeStats").get(reports.getHomeStats);
+router.route("/userHomeStats").get(reports.getUserHomeStats);
 router.route("/homeStatsFixed").get(reports.getHomeStatsFixed);
 
 

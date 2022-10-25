@@ -48,9 +48,19 @@ Report.getReports = async function getReports(filter, result) {
   return new Promise(async (resolve) => {
 
     console.log('filter', filter);
-    const filterArray = filter.Domain_name.length>0 ? [filter.Domain_name, filter.start_date, filter.end_date] : [filter.start_date, filter.end_date] 
-    console.log('filterArray', filterArray);
-    db_read.query("SELECT * FROM `reports` where " +(filter.Domain_name.length>0? "Domain_name = ? and ": "")+"create_at >= ? and create_at <= ? ORDER BY id DESC", filterArray, function (err, res) {
+    let middleQuery =""
+    let filterArray
+    if(filter.userDomains){
+      console.log('filter.userDomains.length', filter.userDomains.length);
+      filter.userDomains.length<2 ? middleQuery = "Domain_name = ? and " : middleQuery = "Domain_name in ? and "
+      filter.userDomains.length<2 ? filter.userDomains = filter.userDomains[0] : filter.userDomains = "("+filter.userDomains.toString()+")"
+      filterArray = [filter.userDomains, filter.start_date, filter.end_date] 
+    }else{
+      middleQuery =(filter.Domain_name.length>0? "Domain_name = ? and ": "")
+      filterArray = filter.Domain_name.length>0 ? [filter.Domain_name, filter.start_date, filter.end_date] : [filter.start_date, filter.end_date] 
+    }
+    console.log('filterArray', filterArray, 'middleQuery', middleQuery);
+    db_read.query("SELECT * FROM `reports` where " +middleQuery+"create_at >= ? and create_at <= ? ORDER BY id DESC", filterArray, function (err, res) {
       if (err) {
         console.log("error: ", err);
         resolve(result(err, null));
@@ -63,7 +73,7 @@ Report.getReports = async function getReports(filter, result) {
 
 };
 
-
+//users_domains join domains on domain_id = domains.id JOIN reports on domains.domainname= reports.Domain_name
 
 Report.deleteFile = function deleteFile(id, result) {
   db_read.query(

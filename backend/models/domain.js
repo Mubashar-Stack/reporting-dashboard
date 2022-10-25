@@ -24,6 +24,25 @@ Domain.findById = function getDomainById(domainId, result) {
   );
 };
 
+Domain.findByDomainIds = function getDomainById(domainIds, result) {
+
+  console.log('hits');
+  let query = domainIds.length<2 ? "id = ?" : "id in ?"
+  domainIds = domainIds.length>1 ? "("+domainIds.toString()+")" : domainIds[0]
+  console.log('query', query, domainIds);
+  db_read.query(
+    "Select * from domains where "+query,domainIds,
+    function (err, res) {
+      if (err) {
+        console.log("error: ", err);
+        result(err, null);
+      } else {
+        result(null, res[0]);
+      }
+    }
+  );
+};
+
 Domain.getDomains = function getAllDomains(result) {
   db_read.query("Select * from domains", function (err, res) {
     if (err) {

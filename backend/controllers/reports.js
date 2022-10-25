@@ -2,6 +2,12 @@ const ModalReport = require("../models/report");
 const csv = require("fast-csv");
 const fs = require("fs");
 const { db_read, db_write } = require("../config/db");
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+const ModalUserDomain = require("../models/users_domains");
+const Domain = require("../models/domain");
+
+
 
 /**
  * Returns User List if found in db
@@ -100,6 +106,117 @@ const { db_read, db_write } = require("../config/db");
       data: {response: responseArray, sums: total},
     });
   } catch (e) {}
+}
+
+const verifyToken = async (token) => {
+  
+  return await User.findById(JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub, (err, response) => {
+    if (!err && response) {
+      return response
+    }
+    return err
+  })
+}
+
+
+
+async function getUserHomeStats(req, res) {
+  try {
+    
+    const token = req.headers.authorization.split(" ")[1];
+    req.user = await verifyToken(token);
+    let userDomains
+    let userDomainsIds = []
+    await ModalUserDomain.getUserDomainsById(req.user.id, (err, response) => {
+      console.log('ok');
+      if (!err && response) {
+        console.log('more ok', response);
+
+        userDomains = response
+        console.log('ist it?', userDomains);
+        return response
+      }
+        return err
+    })
+    userDomains.map(ele=>{
+      userDomainsIds.push(ele.id)
+    })
+    const userDomainsRecords = Domain.findByDomainIds(userDomainsIds, (err, response) => {
+      if (!err && response) {
+        return response
+      }
+        return err
+    })
+
+
+    console.log('req.user', req.user, userDomains, userDomainsIds, userDomainsRecords);
+    const {domain_name, start_date, end_date} = req.query
+    let responseArray = []
+    let total = {Ad_Requests: 0, Ad_Impressions: 0, Revenue: 0, Calculated_Ad_Requests: 0, Calculated_Ad_Impressions: 0, Calculated_Revenue: 0}
+
+    console.log(domain_name, start_date, end_date);
+    const data = {
+      userDomains : userDomainsIds,
+      Domain_name: domain_name? domain_name :"",
+      start_date: start_date? start_date : "",
+      end_date: end_date? end_date : ""
+    }
+    /*
+    alternate code if asked to not calculate cur and last month revenue in every call
+    ModalReport.getReports(data, (err, response) => {
+      if (!err && response) {
+        // console.log('response', response);
+
+        response.map(respons =>{
+          console.log('respons', respons);
+          //we can round this value if req arises i.e Math.round(respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission))))
+          respons.Calculated_Ad_Requests = respons.Ad_Requests - respons.Ad_Requests*(parseFloat(("0."+respons.commission)))
+          respons.Calculated_Ad_Impressions = respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission)))
+          respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+
+        })
+
+        return res.json({
+          message: "success",
+          data: response,
+        });
+      }
+      return res.status(401).send({
+        error: "Not Found",
+        message: "No user found.",
+      });
+    });
+    */
+    await ModalReport.getReports(data, async (err, response) => {
+      if (!err && response) {
+        // console.log('response', response);
+        await Promise.all(
+          response.map(respons =>{
+            console.log('respons', respons);
+            //we can round this value if req arises i.e Math.round(respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission))))
+            respons.Calculated_Ad_Requests = respons.Ad_Requests - respons.Ad_Requests*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Ad_Impressions = respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+            total.Ad_Requests += respons.Ad_Requests
+            total.Ad_Impressions += respons.Ad_Impressions
+            total.Revenue += respons.Revenue
+            total.Calculated_Ad_Requests += respons.Calculated_Ad_Requests
+            total.Calculated_Ad_Impressions += respons.Calculated_Ad_Impressions
+            total.Calculated_Revenue += respons.Calculated_Revenue
+          })
+          )
+        console.log('total', total);
+        responseArray = response
+      }
+    });
+
+    return res.json({
+      message: "success",
+      data: {response: responseArray, sums: total},
+    });
+  } catch (e) {
+    console.log('err', e);
+  }
 }
 
 async function getHomeStatsFixed(req, res) {
@@ -376,4 +493,4 @@ function deleteFile(req, res) {
 }
 
 
-module.exports = { addReport, getAllFiles,deleteFile, getHomeStats, getHomeStatsFixed };
+module.exports = { addReport, getAllFiles,deleteFile, getHomeStats, getHomeStatsFixed, getUserHomeStats };
