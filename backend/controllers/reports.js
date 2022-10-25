@@ -1,4 +1,5 @@
 const ModalReport = require("../models/report");
+const User =require("../models/user")
 const csv = require("fast-csv");
 const fs = require("fs");
 const { db_read, db_write } = require("../config/db");
@@ -101,6 +102,73 @@ const { db_read, db_write } = require("../config/db");
     });
   } catch (e) {}
 }
+
+
+const verifyToken = async (token) => {
+  try {
+    return await User.findById(JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub, (err, response) => {
+      if (!err && response) {
+        return response
+      }
+      return err
+    })
+    
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+async function getUserHomeStats(req, res) {
+  try {
+    if(!req.headers.authorization)
+      res.status(400).json('Token required')
+    const token = req.headers.authorization.split(" ")[1];
+    req.user = await verifyToken(token);
+    if(!req.user)
+      res.status(404).json('User not found!')
+    console.log('req.user', req.user);
+    const {domain_name, start_date, end_date} = req.query
+    let responseArray = []
+    let total = {Ad_Requests: 0, Ad_Impressions: 0, Revenue: 0, Calculated_Ad_Requests: 0, Calculated_Ad_Impressions: 0, Calculated_Revenue: 0}
+
+    console.log(domain_name, start_date, end_date);
+    const data = {
+      userId : req.user.id,
+      Domain_name: domain_name? domain_name :"",
+      start_date: start_date? start_date : "",
+      end_date: end_date? end_date : ""
+    }
+    await ModalReport.getUserReports(data, async (err, response) => {
+      if (!err && response) {
+        // console.log('response', response);
+        await Promise.all(
+          response.map(respons =>{
+            console.log('respons', respons);
+            //we can round this value if req arises i.e Math.round(respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission))))
+            respons.Calculated_Ad_Requests = respons.Ad_Requests - respons.Ad_Requests*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Ad_Impressions = respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+            total.Ad_Requests += respons.Ad_Requests
+            total.Ad_Impressions += respons.Ad_Impressions
+            total.Revenue += respons.Revenue
+            total.Calculated_Ad_Requests += respons.Calculated_Ad_Requests
+            total.Calculated_Ad_Impressions += respons.Calculated_Ad_Impressions
+            total.Calculated_Revenue += respons.Calculated_Revenue
+          })
+          )
+        console.log('total', total);
+        responseArray = response
+      }
+    });
+
+    return res.json({
+      message: "success",
+      data: {response: responseArray, sums: total},
+    });
+  } catch (e) {}
+}
+
 
 async function getHomeStatsFixed(req, res) {
   try {
@@ -277,6 +345,192 @@ async function getHomeStatsFixed(req, res) {
     });
   } catch (e) {}
 }
+
+async function getUserHomeStatsFixed(req, res) {
+  try {
+
+    if(!req.headers.authorization)
+      res.status(400).json('Token required')
+    const token = req.headers.authorization.split(" ")[1];
+    req.user = await verifyToken(token);
+    if(!req.user)
+      res.status(404).json('User not found!')
+    console.log('req.user', req.user);
+
+    let currentMonthStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
+    let lastMonthStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
+    let thisWeekStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
+    let lastWeekStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
+    let todayStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
+    let yesterdayStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
+
+
+    let date = new Date();
+    let firstDayOfCurrentMonth = new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0];
+    let lastDayLastDayOfCurrentMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString().split('T')[0];
+
+    await ModalReport.getUserReports({userId:req.user.id, start_date: firstDayOfCurrentMonth, end_date: lastDayLastDayOfCurrentMonth}, async (err, response) => {
+      if (!err && response) {
+        // console.log('response', response);
+
+        await Promise.all(
+          response.map(respons =>{
+            // console.log('respons', respons);
+            respons.Calculated_Ad_Requests = respons.Ad_Requests - respons.Ad_Requests*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Ad_Impressions = respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+            currentMonthStats.Ad_Requests += respons.Ad_Requests
+            currentMonthStats.Ad_Impressions += respons.Ad_Impressions
+            currentMonthStats.Calculated_Ad_Requests += respons.Calculated_Ad_Requests
+            currentMonthStats.Calculated_Ad_Impressions += respons.Calculated_Ad_Impressions
+            currentMonthStats.revenue += respons.Revenue
+            currentMonthStats.calculatedRevenue += respons.Calculated_Revenue
+          })
+        )
+      }
+    });
+
+    let firstDayOfLastMonth = new Date(date.getFullYear(), date.getMonth()-1, 1).toISOString().split('T')[0];
+    let lastDayLastDayOfLastMonth = new Date(date.getFullYear(), date.getMonth() , 0).toISOString().split('T')[0];
+
+    await ModalReport.getUserReports({userId:req.user.id, start_date: firstDayOfLastMonth, end_date: lastDayLastDayOfLastMonth}, async (err, response) => {
+      
+      if (!err && response) {
+        // console.log('response', response);
+
+        await Promise.all(
+          response.map(respons =>{
+            // console.log('respons', respons);
+            respons.Calculated_Ad_Requests = respons.Ad_Requests - respons.Ad_Requests*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Ad_Impressions = respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+            lastMonthStats.Ad_Requests += respons.Ad_Requests
+            lastMonthStats.Ad_Impressions += respons.Ad_Impressions
+            lastMonthStats.Calculated_Ad_Requests += respons.Calculated_Ad_Requests
+            lastMonthStats.Calculated_Ad_Impressions += respons.Calculated_Ad_Impressions
+            lastMonthStats.revenue += respons.Revenue
+            lastMonthStats.calculatedRevenue += respons.Calculated_Revenue
+          })
+        )
+      }
+    });
+
+    let today = new Date().toISOString().split('T')[0]
+    console.log('today', today);
+    await ModalReport.getUserReports({userId:req.user.id, start_date: today, end_date: today}, async (err, response) => {
+      
+      if (!err && response) {
+        // console.log('response', response);
+
+        await Promise.all(
+          response.map(respons =>{
+            console.log('respons', respons);
+            respons.Calculated_Ad_Requests = respons.Ad_Requests - respons.Ad_Requests*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Ad_Impressions = respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+            todayStats.Ad_Requests += respons.Ad_Requests
+            todayStats.Ad_Impressions += respons.Ad_Impressions
+            todayStats.Calculated_Ad_Requests += respons.Calculated_Ad_Requests
+            todayStats.Calculated_Ad_Impressions += respons.Calculated_Ad_Impressions
+            todayStats.revenue += respons.Revenue
+            todayStats.calculatedRevenue += respons.Calculated_Revenue
+          })
+        )
+      }
+    });
+
+    let yesterDay = new Date()
+    yesterDay.setDate(yesterDay.getDate()-1)
+    yesterDay = yesterDay.toISOString().split('T')[0]
+    console.log('yesterDay', yesterDay);
+
+    await ModalReport.getUserReports({userId:req.user.id, start_date: yesterDay, end_date: yesterDay}, async (err, response) => {
+      
+      if (!err && response) {
+        console.log('response', response);
+
+        await Promise.all(
+          response.map(respons =>{
+            // console.log('respons', respons);
+            respons.Calculated_Ad_Requests = respons.Ad_Requests - respons.Ad_Requests*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Ad_Impressions = respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+            yesterdayStats.Ad_Requests += respons.Ad_Requests
+            yesterdayStats.Ad_Impressions += respons.Ad_Impressions
+            yesterdayStats.Calculated_Ad_Requests += respons.Calculated_Ad_Requests
+            yesterdayStats.Calculated_Ad_Impressions += respons.Calculated_Ad_Impressions
+            yesterdayStats.revenue += respons.Revenue
+            yesterdayStats.calculatedRevenue += respons.Calculated_Revenue
+          })
+        )
+      }
+    });
+
+    let firstDay = date.getDate() - date.getDay(); 
+    let lastDay = firstDay + 6; 
+
+    let firstDayThisWeek = new Date(date.setDate(firstDay)).toISOString().split('T')[0];
+    let lastDayThisWeek = new Date(date.setDate(lastDay)).toISOString().split('T')[0];
+    console.log('firstDayThisWeek', firstDayThisWeek, 'lastDayThisWeek', lastDayThisWeek);
+    await ModalReport.getUserReports({userId:req.user.id, start_date: firstDayThisWeek, end_date: lastDayThisWeek}, async (err, response) => {
+      
+      if (!err && response) {
+        console.log('response', response);
+
+        await Promise.all(
+          response.map(respons =>{
+            // console.log('respons', respons);
+            respons.Calculated_Ad_Requests = respons.Ad_Requests - respons.Ad_Requests*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Ad_Impressions = respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+            thisWeekStats.Ad_Requests += respons.Ad_Requests
+            thisWeekStats.Ad_Impressions += respons.Ad_Impressions
+            thisWeekStats.Calculated_Ad_Requests += respons.Calculated_Ad_Requests
+            thisWeekStats.Calculated_Ad_Impressions += respons.Calculated_Ad_Impressions
+            thisWeekStats.revenue += respons.Revenue
+            thisWeekStats.calculatedRevenue += respons.Calculated_Revenue
+          })
+        )
+      }
+    });
+
+    let date1 =new Date()
+    let firstDay1 = date1.getDate() - date1.getDay()-7; 
+    let lastDay1 = firstDay1 + 6; 
+
+    let firstDayLastWeek = new Date(date1.setDate(firstDay1)).toISOString().split('T')[0];
+    let lastDayLastWeek = new Date(date1.setDate(lastDay1)).toISOString().split('T')[0];
+    console.log('firstDayPrevWeek', firstDayLastWeek, 'lastDayThisWeek', lastDayLastWeek);
+    await ModalReport.getUserReports({userId:req.user.id, start_date: firstDayLastWeek, end_date: lastDayLastWeek}, async (err, response) => {
+      
+      if (!err && response) {
+        console.log('response', response);
+
+        await Promise.all(
+          response.map(respons =>{
+            // console.log('respons', respons);
+            respons.Calculated_Ad_Requests = respons.Ad_Requests - respons.Ad_Requests*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Ad_Impressions = respons.Ad_Impressions - respons.Ad_Impressions*(parseFloat(("0."+respons.commission)))
+            respons.Calculated_Revenue = respons.Revenue - respons.Revenue*(parseFloat(("0."+respons.commission)))
+            lastWeekStats.Ad_Requests += respons.Ad_Requests
+            lastWeekStats.Ad_Impressions += respons.Ad_Impressions
+            lastWeekStats.Calculated_Ad_Requests += respons.Calculated_Ad_Requests
+            lastWeekStats.Calculated_Ad_Impressions += respons.Calculated_Ad_Impressions
+            lastWeekStats.revenue += respons.Revenue
+            lastWeekStats.calculatedRevenue += respons.Calculated_Revenue
+          })
+        )
+      }
+    });
+
+    return res.json({
+      message: "success",
+      data: { thisWeekStats, lastWeekStats, todayStats, yesterdayStats, currentMonthStats, lastMonthStats},
+    });
+  } catch (e) {}
+}
+
+
 function addReport(req, res) {
   try {
     if (!req.files) {
@@ -376,4 +630,4 @@ function deleteFile(req, res) {
 }
 
 
-module.exports = { addReport, getAllFiles,deleteFile, getHomeStats, getHomeStatsFixed };
+module.exports = { addReport, getAllFiles,deleteFile, getHomeStats, getHomeStatsFixed, getUserHomeStats,getUserHomeStatsFixed };
