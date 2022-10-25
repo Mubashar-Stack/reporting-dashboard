@@ -105,20 +105,28 @@ const { db_read, db_write } = require("../config/db");
 
 
 const verifyToken = async (token) => {
-  
-  return await User.findById(JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub, (err, response) => {
-    if (!err && response) {
-      return response
-    }
-    return err
-  })
+  try {
+    return await User.findById(JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString()).sub, (err, response) => {
+      if (!err && response) {
+        return response
+      }
+      return err
+    })
+    
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 
 async function getUserHomeStats(req, res) {
   try {
+    if(!req.headers.authorization)
+      res.status(400).json('Token required')
     const token = req.headers.authorization.split(" ")[1];
     req.user = await verifyToken(token);
+    if(!req.user)
+      res.status(404).json('User not found!')
     console.log('req.user', req.user);
     const {domain_name, start_date, end_date} = req.query
     let responseArray = []
@@ -340,8 +348,13 @@ async function getHomeStatsFixed(req, res) {
 
 async function getUserHomeStatsFixed(req, res) {
   try {
+
+    if(!req.headers.authorization)
+      res.status(400).json('Token required')
     const token = req.headers.authorization.split(" ")[1];
     req.user = await verifyToken(token);
+    if(!req.user)
+      res.status(404).json('User not found!')
     console.log('req.user', req.user);
 
     let currentMonthStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
