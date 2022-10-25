@@ -7,21 +7,31 @@ import CustomerDashboard from './layouts/customerDashboard';
 //
 
 import User from './pages/User';
+import CustomerUser from './pages/customerUser';
+
 import Login from './pages/Login';
 import NotFound from './pages/Page404';
 import Register from './pages/Register';
 
 import DashboardApp from './pages/DashboardApp';
+import DashboardCustomerApp from './pages/DashboardCustomerApp';
+
+import AdminStats from './pages/adminStats';
+import CustomerStats from './pages/customerStats ';
+
+
 import UploadReports from './pages/uploadReports';
 
 import Domains from './pages/domains';
+import CustomerDomains from './pages/customerDomains';
+
 import UsersDomains from './pages/users_domains';
 
 
 // ----------------------------------------------------------------------
 
 export default function Router() {
-  
+
   const isLoggedIn  = window.localStorage.getItem('type');
 
   return useRoutes([
@@ -30,6 +40,7 @@ export default function Router() {
       element: isLoggedIn ==='admin' ? <DashboardLayout /> : <Navigate to="/login" />,
       children: [
         { path: 'app', element: <DashboardApp /> },
+        { path: 'stats', element: <AdminStats /> },
         { path: 'user', element: <User /> },
         { path: 'uploadReports', element: <UploadReports /> },
         { path: 'domains', element: <Domains /> },
@@ -40,7 +51,10 @@ export default function Router() {
       path: '/customerDashboard',
       element: isLoggedIn ==='user' ? <CustomerDashboard /> : <Navigate to="/login" />,
       children: [
-        { path: 'app', element: <DashboardApp /> },
+        { path: 'app', element: <DashboardCustomerApp /> },
+        { path: 'stats', element: <CustomerStats /> },
+        { path: 'profile', element: <CustomerUser /> },
+        { path: 'customerDomains', element: <CustomerDomains /> },
       ],
     },
     {

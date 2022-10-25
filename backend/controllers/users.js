@@ -145,12 +145,14 @@ function updateUser(req, res) {
         data.password = Hash(req.body.password, config.appSecret).toString();
       }
 
-      if (!req.body.isFileChange) {
+      if (req.body.isFileChange == "false") {
         data.photo = req.body.avatar;
       }
       if (!req.body.isChangedPassword) {
         data.password = req.body.password;
       }
+
+      console.log(data,'data');
 
       ModalUser.updateUser(data, (err, response) => {
         if (!err && response) {

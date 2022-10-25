@@ -27,7 +27,7 @@ UserDomain.findById = function getUserDomainById(userDomainId, result) {
 
 UserDomain.getUserDomainsById = function getUserDomainByUserId(user_id, result) {
   db_read.query(
-    "Select * from users_domains where user_id = ?", user_id,
+    "SELECT a.*, b.first_name,b.last_name,b.photo,c.domainname,c.ads_code FROM users_domains AS a JOIN users AS b ON a.user_id = b.id JOIN domains AS c ON a.domain_id = c.id  WHERE user_id = ?", user_id,
     function (err, res) {
       if (err) {
         console.log("error: ", err);

@@ -1,7 +1,7 @@
- /* eslint-disable */
+/* eslint-disable */
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import React, { useState ,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
@@ -22,25 +22,27 @@ import {
   TablePagination,
   TextField,
   FormControl,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
 } from '@mui/material';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
+
 // components
 import Page from '../components/Page';
-import Label from '../components/Label';
-import Scrollbar from '../components/Scrollbar';
-import Iconify from '../components/Iconify';
-import SearchNotFound from '../components/SearchNotFound';
-import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/domains';
-import { RegisterForm } from '../sections/@dashboard/domains/add';
 
+import Scrollbar from '../components/Scrollbar';
+
+import SearchNotFound from '../components/SearchNotFound';
+import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/customerDomains';
+import Iconify from '../components/Iconify';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
+  { id: 'domains', label: 'Domains', alignRight: false },
   { id: 'ads_code', label: 'Ads Code', alignRight: false },
-  { id: 'createdAt', label: 'Created At', alignRight: false },
+  { id: 'Action', label: 'Action', alignRight: false },
   { id: '' },
 ];
 
@@ -95,20 +97,18 @@ export default function User() {
   useEffect(() => {
     let config = {
       method: 'get',
-      url: 'http://localhost:5000/domains',
+      url: `http://localhost:5000/users_domains_by_user_id/${window.localStorage.getItem('id')}`,
       headers: {},
     };
     axios(config)
       .then(function (response) {
         console.log(JSON.parse(JSON.stringify(response.data.data)));
         setAllDomainList(JSON.parse(JSON.stringify(response.data.data)));
-
       })
       .catch(function (error) {
         console.log(error);
       });
   }, []);
-
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -173,37 +173,6 @@ export default function User() {
   return (
     <Page title="User">
       <Container>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4" gutterBottom>
-            Domains
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={handleOpen}
-            component={RouterLink}
-            to="#"
-            startIcon={<Iconify icon="eva:plus-fill" />}
-          >
-            New Domain
-          </Button>
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            {/* <Box sx={{ ...style, width: '50%',}}>
-              <Typography variant="h4" gutterBottom>
-                Add New User
-              </Typography>
-
-              <Typography sx={{ color: 'text.secondary', mb: 5 }}>Enter your details below.</Typography> */}
-
-              <RegisterForm />
-            {/* </Box> */}
-          </Modal>
-        </Stack>
-
         <Card>
           <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
@@ -221,7 +190,7 @@ export default function User() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, domainname, ads_code, created_at } = row;
+                    const { id, domainname, first_name, last_name, photo, ads_code, created_at } = row;
                     const isItemSelected = selected.indexOf(domainname) !== -1;
 
                     return (
@@ -233,23 +202,38 @@ export default function User() {
                         selected={isItemSelected}
                         aria-checked={isItemSelected}
                       >
-                        <TableCell padding="checkbox">
-                         
-                        </TableCell>
+                        <TableCell padding="checkbox"></TableCell>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
+                            <Avatar alt={first_name} src={`http://localhost:5000/${photo}`} />
                             <Typography variant="subtitle2" noWrap>
-                              {`${domainname}`}
+                              {`${first_name} ${last_name}`}
                             </Typography>
                           </Stack>
                         </TableCell>
+                        <TableCell align="left">{domainname}</TableCell>
                         <TableCell align="left">{ads_code?.split('_')[1]}</TableCell>
-                        <TableCell align="left">
-                        {new Date(created_at).toString()}
-                        </TableCell>
 
                         <TableCell align="right">
-                          <UserMoreMenu row={row} />
+                          <IconButton width={34} height={24}>
+                            <Iconify
+                              icon="eva:download-fill"
+                              onClick={() => {
+                                const link = `http://localhost:5000/${ads_code}`;
+                                window.open(link);
+                              }}
+                              width={34}
+                              height={24}
+                            />
+                            <ListItemText
+                              primary="Download"
+                              onClick={() => {
+                                const link = `http://localhost:5000/${ads_code}`;
+                                window.open(link);
+                              }}
+                              primaryTypographyProps={{ variant: 'body2' }}
+                            />
+                          </IconButton>
                         </TableCell>
                       </TableRow>
                     );

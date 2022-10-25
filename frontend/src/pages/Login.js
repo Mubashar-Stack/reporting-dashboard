@@ -1,4 +1,6 @@
-import { Link as RouterLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link as RouterLink ,useNavigate} from 'react-router-dom';
+
 // @mui
 import { styled } from '@mui/material/styles';
 import { Card, Link, Container, Typography } from '@mui/material';
@@ -9,7 +11,7 @@ import Page from '../components/Page';
 import Logo from '../components/Logo';
 // sections
 import { LoginForm } from '../sections/auth/login';
-import AuthSocial from '../sections/auth/AuthSocial';
+
 
 // ----------------------------------------------------------------------
 
@@ -57,24 +59,25 @@ const ContentStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function Login() {
+  const navigate = useNavigate();
   const smUp = useResponsive('up', 'sm');
 
   const mdUp = useResponsive('up', 'md');
+
+  useEffect(() => {
+    const token = window.localStorage.getItem('token');
+    const type = window.localStorage.getItem('type');
+    if (token) {
+      console.log(type === 'admin' ? '/dashboard/app' : '/customerDashboard/app');
+      navigate(type === 'admin' ? '/dashboard/app' : '/customerDashboard/app', { replace: true });
+    }
+  }, []);
 
   return (
     <Page title="Login">
       <RootStyle>
         <HeaderStyle>
           <Logo />
-
-          {smUp && (
-            <Typography variant="body2" sx={{ mt: { md: -2 } }}>
-              Don’t have an account? {''}
-              <Link variant="subtitle2" component={RouterLink} to="/register">
-                Get started
-              </Link>
-            </Typography>
-          )}
         </HeaderStyle>
 
         {mdUp && (
@@ -89,23 +92,12 @@ export default function Login() {
         <Container maxWidth="sm">
           <ContentStyle>
             <Typography variant="h4" gutterBottom>
-              Sign in to Minimal
+              Sign in
             </Typography>
 
             <Typography sx={{ color: 'text.secondary', mb: 5 }}>Enter your details below.</Typography>
 
-            <AuthSocial />
-
             <LoginForm />
-
-            {!smUp && (
-              <Typography variant="body2" align="center" sx={{ mt: 3 }}>
-                Don’t have an account?{' '}
-                <Link variant="subtitle2" component={RouterLink} to="/register">
-                  Get started
-                </Link>
-              </Typography>
-            )}
           </ContentStyle>
         </Container>
       </RootStyle>

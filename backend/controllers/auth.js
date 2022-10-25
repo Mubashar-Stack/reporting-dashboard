@@ -11,7 +11,7 @@ const Hash = require('crypto-js/pbkdf2');
 */
 function login(req, res) {
     
-    db_read.query('SELECT id, email, password,type FROM users where email = ?', [req.body.email], (err, response, fields) => {
+    db_read.query('SELECT id, email, password,type,first_name,last_name,email,photo FROM users where email = ?', [req.body.email], (err, response, fields) => {
         if(!err && response.length === 1){
             const user = response[0];
             
@@ -25,11 +25,20 @@ function login(req, res) {
                     exp: Math.floor(Date.now() / 1000) + config.jwtExpire, // expire time
                     sub: user.id,                                          // Identifies the subject of the JWT.
                 };
+
+                console.log('====================================');
+                console.log(user);
+                console.log('====================================');
                 
                 res.json({
                     message: "success",
                     status:true,
-                    type:user.type,
+                    type:user?.type,
+                    email: user?.email,
+                    first_name: user?.first_name,
+                    last_name: user?.last_name,
+                    photo: user?.photo,
+                    id: user?.id,
                     data: jwt.sign(sign, config.jwtSecret)
                 });
             }

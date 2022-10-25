@@ -53,13 +53,19 @@ export default function LoginForm() {
       data: data,
     };
     axios(config)
-      .then(function (response) {
+      .then(async (response) => {
         const result = JSON.parse(JSON.stringify(response.data));
-        console.log(result, result?.data, result?.type);
+        console.log(result?.data, result?.type);
         window.localStorage.setItem('token', result?.data);
         window.localStorage.setItem('type', result?.type);
-        navigate(result?.type == 'admin'?'/dashboard/app':'/customerDashboard/app', { replace: true });
-       
+        window.localStorage.setItem('first_name', result?.first_name);
+        window.localStorage.setItem('last_name', result?.last_name);
+        window.localStorage.setItem('email', result?.email);
+        window.localStorage.setItem('photo', result?.photo);
+        window.localStorage.setItem('id', result?.id);
+
+        console.log(result?.type == 'admin' ? '/dashboard/app' : '/customerDashboard/app');
+        navigate(result?.type == 'admin' ? '/dashboard/app' : '/customerDashboard/app', { replace: true });
       })
       .catch(function (error) {
         console.log(error);
