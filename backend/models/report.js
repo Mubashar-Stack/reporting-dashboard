@@ -63,6 +63,26 @@ Report.getReports = async function getReports(filter, result) {
 
 };
 
+Report.getUserReports = async function getReports(filter, result) {
+
+  return new Promise(async (resolve) => {
+
+    console.log('filter', filter);
+    // const filterArray = filter.Domain_name.length>0 ? [filter.Domain_name, filter.start_date, filter.end_date] : [filter.start_date, filter.end_date] 
+    // console.log('filterArray', filterArray);
+    db_read.query("SELECT reports.id, user_id, domain_id,  reports.Domain_name,Ad_Requests, Ad_Impressions, Revenue, commission, reports.create_at, reports.updated_at , eCPM FROM users_domains join domains on domain_id = domains.id JOIN reports on domains.domainname= reports.Domain_name where user_id = ? and create_at >= ? and create_at <= ? ORDER BY reports.id DESC", [filter.userId, filter.start_date, filter.end_date], function (err, res) {
+      if (err) {
+        console.log("error: ", err);
+        resolve(result(err, null));
+      } else {
+        // result(null, res);
+        resolve(result(null, res));
+      }
+    });
+  });
+
+};
+
 
 
 Report.deleteFile = function deleteFile(id, result) {
