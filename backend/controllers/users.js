@@ -71,7 +71,26 @@ function addUser(req, res) {
       //Use the mv() method to place the file in the upload directory (i.e. "uploads")
       avatar.mv(
         "./uploads/" + Math.floor(new Date() / 1000) + "_" + avatar.name
-      );
+        );
+        
+      if (!req.body.paypal_email_address ||
+          !req.body.bank_account_holder_address ||
+          !req.body.IFSC_code ||
+          !req.body.account_number ||
+          !req.body.bank_ac_holder_name ||
+          !req.body.bank_address ||
+          !req.body.banck_name)
+        res.status(403).json({
+          message: "Bank details are mendatory", bank_obj: {
+            banck_name: req.body.banck_name || null,
+            bank_address: req.body.bank_address || null,
+            bank_ac_holder_name: req.body.bank_ac_holder_name || null,
+            account_number: req.body.account_number || null,
+            IFSC_code: req.body.IFSC_code || null,
+            bank_account_holder_address: req.body.bank_account_holder_address || null,
+            paypal_email_address: req.body.paypal_email_address || null,
+          }
+        })
 
       const data = {
         firstName: req.body.firstName,
@@ -83,7 +102,16 @@ function addUser(req, res) {
         card_number: req.body.card_number,
         cvc: req.body.cvc,
         expiry_date: new Date(req.body.expiry_date),
+        banck_name: req.body.banck_name,
+        bank_address: req.body.bank_address,
+        bank_ac_holder_name: req.body.bank_ac_holder_name,
+        account_number: req.body.account_number,
+        IFSC_code: req.body.IFSC_code,
+        bank_account_holder_address: req.body.bank_account_holder_address,
+        swift_bic_code: req.body.swift_bic_code,
+        paypal_email_address: req.body.paypal_email_address,
       };
+
 
       ModalUser.addUser(data, (err, response) => {
         if (!err && response) {
@@ -136,6 +164,14 @@ function updateUser(req, res) {
         card_number: req.body.card_number,
         cvc: req.body.cvc,
         expiry_date: new Date(req.body.expiry_date),
+        banck_name: req.body.banck_name,
+        bank_address: req.body.bank_address,
+        bank_ac_holder_name: req.body.bank_ac_holder_name,
+        account_number: req.body.account_number,
+        IFSC_code: req.body.IFSC_code,
+        bank_account_holder_address: req.body.bank_account_holder_address,
+        swift_bic_code: req.body.swift_bic_code,
+        paypal_email_address: req.body.paypal_email_address,
       };
 
       if (req.files) {
