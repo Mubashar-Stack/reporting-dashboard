@@ -18,8 +18,10 @@ export default function DashboardApp() {
   useEffect(() => {
     let config = {
       method: 'get',
-      url: 'http://localhost:5000/homeStatsFixed',
-      headers: {},
+      url: 'http://localhost:5000/userHomeStatsFixed',
+      headers: { 
+        'Authorization': `Bearer ${window.localStorage.getItem('token')}`
+      }
     };
     axios(config)
       .then(function (response) {

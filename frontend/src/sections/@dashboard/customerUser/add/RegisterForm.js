@@ -30,11 +30,13 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 export default function HorizontalLabelPositionBelowStepper(props) {
-  const { isEdit, isView, data } = props;
+  const { isEdit, isView, data, isDisabled } = props;
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = React.useState(0);
   const [showPassword, setShowPassword] = React.useState(false);
   const [disabled, setDisabled] = React.useState(false);
+  const [customDisabled, setCustomeDisabled] = React.useState(isDisabled);
+
   const [isFileChange, setIsFileChange] = React.useState(false);
   const [isChangedPassword, setIsChangedPassword] = React.useState(false);
 
@@ -46,10 +48,15 @@ export default function HorizontalLabelPositionBelowStepper(props) {
   const [lastName, setLastName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [nameCardHolder, setNameCardHolder] = React.useState('');
-  const [cardNumber, setCardNumber] = React.useState('');
-  const [cardExpire, setCardExpire] = React.useState(new Date());
-  const [cardCSV, setCardCSV] = React.useState('');
+  const [bankName, setBankName] = React.useState('');
+  const [bankAddress, setBankAddress] = React.useState('');
+  const [accountHolderName, setAccountHolderName] = React.useState('');
+  const [accountNumber, setAccountNumber] = React.useState('');
+  const [IFSCCode, setIFSCCode] = React.useState('');
+  const [accountHolderAddress, setAccountHolderAddress] = React.useState('');
+  const [SWIFTBICCode, setSWIFTBICCode] = React.useState('');
+  const [payPalEmail, setPayPalEmail] = React.useState('');
+
   const [issuccess, setIsSuccess] = React.useState(false);
   const [message, setMessage] = React.useState('');
 
@@ -175,7 +182,7 @@ export default function HorizontalLabelPositionBelowStepper(props) {
                 }}
                 id="icon-button-file"
                 type="file"
-                disabled={disabled}
+                disabled={customDisabled}
                 onChange={(e) => {
                   setUserImage(e);
                 }}
@@ -192,7 +199,7 @@ export default function HorizontalLabelPositionBelowStepper(props) {
                 <TextField
                   required
                   id="firstName"
-                  disabled={disabled}
+                  disabled={customDisabled}
                   label="First Name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
@@ -200,7 +207,7 @@ export default function HorizontalLabelPositionBelowStepper(props) {
                 <TextField
                   required
                   id="lastName"
-                  disabled={disabled}
+                  disabled={customDisabled}
                   value={lastName}
                   label="Last Name"
                   onChange={(e) => setLastName(e.target.value)}
@@ -210,7 +217,7 @@ export default function HorizontalLabelPositionBelowStepper(props) {
                 required
                 id="email"
                 label="Email"
-                disabled={disabled}
+                disabled={customDisabled}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -218,7 +225,7 @@ export default function HorizontalLabelPositionBelowStepper(props) {
                 required
                 name="password"
                 label="Password"
-                disabled={disabled}
+                disabled={customDisabled}
                 value={isEdit ? (isChangedPassword ? password : '') : password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -247,56 +254,93 @@ export default function HorizontalLabelPositionBelowStepper(props) {
             <Grid item xs={12} md={6}>
               <TextField
                 required
-                id="cardName"
-                label="Name on card"
-                value={nameCardHolder}
+                id="Bank Name "
+                label="Bank Name "
+                value={bankName}
                 disabled={disabled}
                 fullWidth
-                autoComplete="cc-name"
-                onChange={(e) => setNameCardHolder(e.target.value)}
+                // autoComplete="cc-name"
+                onChange={(e) => setBankName(e.target.value)}
               />
             </Grid>
             <Grid item xs={12} md={6}>
               <TextField
                 required
-                id="cardNumber"
-                label="Card number"
-                value={cardNumber}
+                id="bankAddress"
+                label="Bank Address"
+                value={bankAddress}
                 disabled={disabled}
                 fullWidth
-                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                autoComplete="cc-number"
-                onChange={(e) => setCardNumber(e.target.value)}
-              />
-            </Grid>
+                // inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
 
-            <Grid item xs={12} md={6}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  // inputFormat="yyyy-MM"
-                  views={['year', 'month']}
-                  renderInput={(props) => <TextField {...props} />}
-                  label="Date"
-                  disabled={disabled}
-                  value={cardExpire}
-                  onChange={(newValue) => {
-                    setCardExpire(newValue);
-                  }}
-                />
-              </LocalizationProvider>
+                onChange={(e) => setBankAddress(e.target.value)}
+              />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField
+            <TextField
                 required
-                id="cvv"
-                label="CVV"
-                value={cardCSV}
+                id="accountHolderName"
+                label="Account Holder Name"
+                value={accountHolderName}
                 disabled={disabled}
-                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                helperText="Last three digits on signature strip"
                 fullWidth
-                autoComplete="cc-csc"
-                onChange={(e) => setCardCSV(e.target.value)}
+                onChange={(e) => setAccountHolderName(e.target.value)}
+              />
+            </Grid>{' '}
+            <Grid item xs={12} md={6}>
+            <TextField
+                required
+                id="accountNumber"
+                label="Account Number"
+                value={accountNumber}
+                disabled={disabled}
+                fullWidth
+                onChange={(e) => setAccountNumber(e.target.value)}
+              />
+            </Grid>{' '}
+            <Grid item xs={12} md={6} lg={12}>
+            <TextField
+                required
+                id="accountHolderAddress"
+                label="Account Holder Address"
+                value={accountHolderAddress}
+                disabled={disabled}
+                fullWidth
+                onChange={(e) => setAccountHolderAddress(e.target.value)}
+              />
+            </Grid>
+           
+            <Grid item xs={12} md={6}>
+            <TextField
+                required
+                id="IFSCCode"
+                label="IFSCCode"
+                value={IFSCCode}
+                disabled={disabled}
+                fullWidth
+                onChange={(e) => setIFSCCode(e.target.value)}
+              />
+            </Grid>{' '}
+          
+            <Grid item xs={12} md={6}>
+              <TextField
+                
+                id="SWIFTBICCode"
+                label="SWIFT/BIC Code"
+                value={SWIFTBICCode}
+                disabled={disabled}
+                fullWidth
+                onChange={(e) => setSWIFTBICCode(e.target.value)}
+              />
+            </Grid>{' '}
+            <Grid item xs={12} md={6} lg={12}>
+              <TextField
+                id="payPalEmail"
+                label="PayPal Email"
+                value={payPalEmail}
+                disabled={disabled}
+                fullWidth
+                onChange={(e) => setPayPalEmail(e.target.value)}
               />
             </Grid>
           </Grid>

@@ -145,7 +145,7 @@ export default function User() {
 
   return (
     <Page title="User">
-      <RegisterForm isEdit={true} data={{ id: window.localStorage.getItem('id') }} />
+      <RegisterForm isEdit={true} data={{ id: window.localStorage.getItem('id') }} isDisabled={true} />
     </Page>
   );
 }

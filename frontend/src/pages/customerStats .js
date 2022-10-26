@@ -123,10 +123,12 @@ export default function User() {
   useEffect(() => {
     let config = {
       method: 'get',
-      url: `http://localhost:5000/homeStats?domain_name=${domainSelected}&start_date=${
+      url: `http://localhost:5000/userHomeStats?domain_name=${domainSelected}&start_date=${
         new Date(fromdate).toISOString().slice(0, 19).replace('T', ' ').split(' ')[0]
       }&end_date=${new Date(todate).toISOString().slice(0, 19).replace('T', ' ').split(' ')[0]}`,
-      headers: {},
+      headers: { 
+        'Authorization': `Bearer ${window.localStorage.getItem('token')}`
+      },
     };
     axios(config)
       .then(function (response) {
@@ -142,7 +144,7 @@ export default function User() {
   useEffect(() => {
     let config = {
       method: 'get',
-      url: 'http://localhost:5000/domains',
+      url: `http://localhost:5000/users_domains_by_user_id/${window.localStorage.getItem('id')}`,
       headers: {},
     };
     axios(config)
