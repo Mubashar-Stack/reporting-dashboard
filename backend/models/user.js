@@ -12,6 +12,14 @@ const User = (data) => {
   this.card_number = data.card_number;
   this.cvc = data.cvc;
   this.expiry_date = data.expiry_date;
+  this.banck_name = data.banck_name;
+  this.bank_address = data.bank_address;
+  this.bank_ac_holder_name = data.bank_ac_holder_name;
+  this.account_number = data.account_number;
+  this.IFSC_code = data.IFSC_code;
+  this.bank_account_holder_address = data.bank_account_holder_address;
+  this.swift_bic_code = data.swift_bic_code;
+  this.paypal_email_address = data.paypal_email_address;
   this.created_at = new Date();
   this.updated_at = new Date();
 };
@@ -61,6 +69,14 @@ User.addUser = function addUser(input, result) {
     card_number: input.card_number,
     cvc: input.cvc,
     expiry_date: input.expiry_date,
+    banck_name: input.banck_name,
+    bank_address: input.bank_address,
+    bank_ac_holder_name: input.bank_ac_holder_name,
+    account_number: input.account_number,
+    IFSC_code: input.IFSC_code,
+    bank_account_holder_address: input.bank_account_holder_address,
+    swift_bic_code: input.swift_bic_code,
+    paypal_email_address: input.paypal_email_address,
     create_at: currentDate,
     updated_at: currentDate,
   };
@@ -108,6 +124,14 @@ User.updateUser = function updateUser(input, result) {
         data.card_number = input.card_number ? input.card_number : response[0].card_number
         data.cvc = input.cvc ? input.cvc : response[0].cvc
         data.expiry_date = input.expiry_date ? input.expiry_date : response[0].expiry_date
+        data.banck_name = input.banck_name ? input.banck_name : response[0].banck_name
+        data.bank_address = input.bank_address ? input.bank_address : response[0].bank_address
+        data.bank_ac_holder_name = input.bank_ac_holder_name ? input.bank_ac_holder_name : response[0].bank_ac_holder_name
+        data.account_number = input.account_number ? input.account_number : response[0].account_number
+        data.IFSC_code = input.IFSC_code ? input.IFSC_code : response[0].IFSC_code
+        data.bank_account_holder_address = input.bank_account_holder_address ? input.bank_account_holder_address : response[0].bank_account_holder_address
+        data.swift_bic_code = input.swift_bic_code ? input.swift_bic_code : response[0].swift_bic_code
+        data.paypal_email_address = input.paypal_email_address ? input.paypal_email_address : response[0].paypal_email_address
         db_write.query(
           "UPDATE users SET ? WHERE id=?",
           [data, input.userId],
