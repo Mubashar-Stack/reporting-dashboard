@@ -7,6 +7,7 @@ const users = require("../controllers/users");
 const domains = require("../controllers/domains");
 const users_domains = require("../controllers/user_domain");
 const reports = require("../controllers/reports");
+const final_payable = require("../controllers/final_payable");
 
 
 router
@@ -43,6 +44,11 @@ router.route("/homeStats").get(reports.getHomeStats);
 router.route("/userHomeStats").get(reports.getUserHomeStats);
 router.route("/homeStatsFixed").get(reports.getHomeStatsFixed);
 router.route("/userHomeStatsFixed").get(reports.getUserHomeStatsFixed);
+
+
+router.route("/final-payable/new").post(final_payable.addFinalPayable);
+router.route("/monthly-payable").get(final_payable.getMonthlyReport);
+router.route("/user-monthly-payable").get(final_payable.getUserMonthlyReport);
 
 
 
