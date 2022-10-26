@@ -139,6 +139,7 @@ async function getUserHomeStats(req, res) {
       start_date: start_date? start_date : "",
       end_date: end_date? end_date : ""
     }
+    console.log('whats the update?', data);
     await ModalReport.getUserReports(data, async (err, response) => {
       if (!err && response) {
         // console.log('response', response);
@@ -369,7 +370,7 @@ async function getUserHomeStatsFixed(req, res) {
     let firstDayOfCurrentMonth = new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0];
     let lastDayLastDayOfCurrentMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).toISOString().split('T')[0];
 
-    await ModalReport.getUserReports({userId:req.user.id, start_date: firstDayOfCurrentMonth, end_date: lastDayLastDayOfCurrentMonth}, async (err, response) => {
+    await ModalReport.getUserReports({ Domain_name: "", userId:req.user.id, start_date: firstDayOfCurrentMonth, end_date: lastDayLastDayOfCurrentMonth}, async (err, response) => {
       if (!err && response) {
         // console.log('response', response);
 
@@ -393,7 +394,7 @@ async function getUserHomeStatsFixed(req, res) {
     let firstDayOfLastMonth = new Date(date.getFullYear(), date.getMonth()-1, 1).toISOString().split('T')[0];
     let lastDayLastDayOfLastMonth = new Date(date.getFullYear(), date.getMonth() , 0).toISOString().split('T')[0];
 
-    await ModalReport.getUserReports({userId:req.user.id, start_date: firstDayOfLastMonth, end_date: lastDayLastDayOfLastMonth}, async (err, response) => {
+    await ModalReport.getUserReports({ Domain_name: "", userId:req.user.id, start_date: firstDayOfLastMonth, end_date: lastDayLastDayOfLastMonth}, async (err, response) => {
       
       if (!err && response) {
         // console.log('response', response);
@@ -417,7 +418,7 @@ async function getUserHomeStatsFixed(req, res) {
 
     let today = new Date().toISOString().split('T')[0]
     console.log('today', today);
-    await ModalReport.getUserReports({userId:req.user.id, start_date: today, end_date: today}, async (err, response) => {
+    await ModalReport.getUserReports({ Domain_name: "", userId:req.user.id, start_date: today, end_date: today}, async (err, response) => {
       
       if (!err && response) {
         // console.log('response', response);
@@ -444,7 +445,7 @@ async function getUserHomeStatsFixed(req, res) {
     yesterDay = yesterDay.toISOString().split('T')[0]
     console.log('yesterDay', yesterDay);
 
-    await ModalReport.getUserReports({userId:req.user.id, start_date: yesterDay, end_date: yesterDay}, async (err, response) => {
+    await ModalReport.getUserReports({ Domain_name: "", userId:req.user.id, start_date: yesterDay, end_date: yesterDay}, async (err, response) => {
       
       if (!err && response) {
         console.log('response', response);
@@ -472,7 +473,7 @@ async function getUserHomeStatsFixed(req, res) {
     let firstDayThisWeek = new Date(date.setDate(firstDay)).toISOString().split('T')[0];
     let lastDayThisWeek = new Date(date.setDate(lastDay)).toISOString().split('T')[0];
     console.log('firstDayThisWeek', firstDayThisWeek, 'lastDayThisWeek', lastDayThisWeek);
-    await ModalReport.getUserReports({userId:req.user.id, start_date: firstDayThisWeek, end_date: lastDayThisWeek}, async (err, response) => {
+    await ModalReport.getUserReports({ Domain_name: "", userId:req.user.id, start_date: firstDayThisWeek, end_date: lastDayThisWeek}, async (err, response) => {
       
       if (!err && response) {
         console.log('response', response);
@@ -501,7 +502,7 @@ async function getUserHomeStatsFixed(req, res) {
     let firstDayLastWeek = new Date(date1.setDate(firstDay1)).toISOString().split('T')[0];
     let lastDayLastWeek = new Date(date1.setDate(lastDay1)).toISOString().split('T')[0];
     console.log('firstDayPrevWeek', firstDayLastWeek, 'lastDayThisWeek', lastDayLastWeek);
-    await ModalReport.getUserReports({userId:req.user.id, start_date: firstDayLastWeek, end_date: lastDayLastWeek}, async (err, response) => {
+    await ModalReport.getUserReports({ Domain_name: "", userId:req.user.id, start_date: firstDayLastWeek, end_date: lastDayLastWeek}, async (err, response) => {
       
       if (!err && response) {
         console.log('response', response);
