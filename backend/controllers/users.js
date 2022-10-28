@@ -73,24 +73,24 @@ function addUser(req, res) {
         "./uploads/" + Math.floor(new Date() / 1000) + "_" + avatar.name
         );
         
-      if (!req.body.paypal_email_address ||
-          !req.body.bank_account_holder_address ||
-          !req.body.IFSC_code ||
-          !req.body.account_number ||
-          !req.body.bank_ac_holder_name ||
-          !req.body.bank_address ||
-          !req.body.banck_name)
-        res.status(403).json({
-          message: "Bank details are mendatory", bank_obj: {
-            banck_name: req.body.banck_name || null,
-            bank_address: req.body.bank_address || null,
-            bank_ac_holder_name: req.body.bank_ac_holder_name || null,
-            account_number: req.body.account_number || null,
-            IFSC_code: req.body.IFSC_code || null,
-            bank_account_holder_address: req.body.bank_account_holder_address || null,
-            paypal_email_address: req.body.paypal_email_address || null,
-          }
-        })
+      // if (!req.body.paypal_email_address ||
+      //     !req.body.bank_account_holder_address ||
+      //     !req.body.IFSC_code ||
+      //     !req.body.account_number ||
+      //     !req.body.bank_ac_holder_name ||
+      //     !req.body.bank_address ||
+      //     !req.body.banck_name)
+      //   res.status(403).json({
+      //     message: "Bank details are mendatory", bank_obj: {
+      //       banck_name: req.body.banck_name || null,
+      //       bank_address: req.body.bank_address || null,
+      //       bank_ac_holder_name: req.body.bank_ac_holder_name || null,
+      //       account_number: req.body.account_number || null,
+      //       IFSC_code: req.body.IFSC_code || null,
+      //       bank_account_holder_address: req.body.bank_account_holder_address || null,
+      //       paypal_email_address: req.body.paypal_email_address || null,
+      //     }
+      //   })
 
       const data = {
         firstName: req.body.firstName,
