@@ -180,6 +180,21 @@ async function getHomeStatsFixed(req, res) {
     let lastWeekStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
     let todayStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
     let yesterdayStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
+    let currentYearStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
+    let monthwiseData = {
+      jan: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      feb: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      mar: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      apr: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      may: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      jun: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      jul: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      aug: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      sep: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      oct: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      nov: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      dec: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 }
+    }
 
 
     let date = new Date();
@@ -340,9 +355,127 @@ async function getHomeStatsFixed(req, res) {
       }
     });
 
+    const currentYear = new Date().getFullYear();
+    const currentYearFirstDay = new Date(currentYear, 0, 1);
+    const currentYearLastDay = new Date(currentYear, 11, 31);
+
+    await ModalReport.getReports({ Domain_name: "", start_date: currentYearFirstDay, end_date: currentYearLastDay }, async (err, response) => {
+      console.log('err :/'.err);
+      if (!err && response) {
+        console.log('response', response);
+
+        await Promise.all(
+          response.map(respons => {
+
+            let createDate = new Date(respons.create_at)
+            console.log('createDate.getMonth()', createDate.getMonth());
+            if (createDate.getMonth() == 0) {
+              monthwiseData.jan.Ad_Requests += respons.Ad_Requests
+              monthwiseData.jan.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.jan.Revenue += respons.Revenue
+              monthwiseData.jan.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jan.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jan.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 1) {
+              monthwiseData.feb.Ad_Requests += respons.Ad_Requests
+              monthwiseData.feb.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.feb.Revenue += respons.Revenue
+              monthwiseData.feb.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.feb.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.feb.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 2) {
+              monthwiseData.mar.Ad_Requests += respons.Ad_Requests
+              monthwiseData.mar.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.mar.Revenue += respons.Revenue
+              monthwiseData.mar.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.mar.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.mar.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 3) {
+              monthwiseData.apr.Ad_Requests += respons.Ad_Requests
+              monthwiseData.apr.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.apr.Revenue += respons.Revenue
+              monthwiseData.apr.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.apr.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.apr.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 4) {
+              monthwiseData.may.Ad_Requests += respons.Ad_Requests
+              monthwiseData.may.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.may.Revenue += respons.Revenue
+              monthwiseData.may.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.may.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.may.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 5) {
+              monthwiseData.jun.Ad_Requests += respons.Ad_Requests
+              monthwiseData.jun.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.jun.Revenue += respons.Revenue
+              monthwiseData.jun.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jun.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jun.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 6) {
+              monthwiseData.jul.Ad_Requests += respons.Ad_Requests
+              monthwiseData.jul.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.jul.Revenue += respons.Revenue
+              monthwiseData.jul.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jul.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jul.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 7) {
+              monthwiseData.aug.Ad_Requests += respons.Ad_Requests
+              monthwiseData.aug.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.aug.Revenue += respons.Revenue
+              monthwiseData.aug.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.aug.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.aug.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 8) {
+              monthwiseData.sep.Ad_Requests += respons.Ad_Requests
+              monthwiseData.sep.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.sep.Revenue += respons.Revenue
+              monthwiseData.sep.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.sep.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.sep.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 9) {
+              monthwiseData.oct.Ad_Requests += respons.Ad_Requests
+              monthwiseData.oct.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.oct.Revenue += respons.Revenue
+              monthwiseData.oct.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.oct.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.oct.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 10) {
+              monthwiseData.nov.Ad_Requests += respons.Ad_Requests
+              monthwiseData.nov.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.nov.Revenue += respons.Revenue
+              monthwiseData.nov.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.nov.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.nov.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 11) {
+              monthwiseData.dec.Ad_Requests += respons.Ad_Requests
+              monthwiseData.dec.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.dec.Revenue += respons.Revenue
+              monthwiseData.dec.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.dec.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.dec.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+          })
+        )
+      }
+    });
+
+    console.log('monthwiseData', monthwiseData);
+
     return res.json({
       message: "success",
       data: { thisWeekStats, lastWeekStats, todayStats, yesterdayStats, currentMonthStats, lastMonthStats},
+      monthwiseData
     });
   } catch (e) {}
 }
@@ -364,6 +497,20 @@ async function getUserHomeStatsFixed(req, res) {
     let lastWeekStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
     let todayStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
     let yesterdayStats= {Ad_Requests:0, Calculated_Ad_Requests:0, Ad_Impressions:0, Calculated_Ad_Impressions: 0, revenue: 0, calculatedRevenue: 0}
+    let monthwiseData = {
+      jan: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      feb: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      mar: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      apr: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      may: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      jun: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      jul: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      aug: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      sep: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      oct: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      nov: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 },
+      dec: { Ad_Requests: 0, Calculated_Ad_Requests: 0, Ad_Impressions: 0, Calculated_Ad_Impressions: 0, Revenue: 0, calculatedRevenue: 0 }
+    }
 
 
     let date = new Date();
@@ -524,9 +671,127 @@ async function getUserHomeStatsFixed(req, res) {
       }
     });
 
+    const currentYear = new Date().getFullYear();
+    const currentYearFirstDay = new Date(currentYear, 0, 1);
+    const currentYearLastDay = new Date(currentYear, 11, 31);
+
+    await ModalReport.getUserReports({ Domain_name: "", userId:req.user.id, start_date: currentYearFirstDay, end_date: currentYearLastDay }, async (err, response) => {
+      console.log('err :/'.err);
+      if (!err && response) {
+        console.log('response', response);
+
+        await Promise.all(
+          response.map(respons => {
+
+            let createDate = new Date(respons.create_at)
+            console.log('createDate.getMonth()', createDate.getMonth());
+            if (createDate.getMonth() == 0) {
+              monthwiseData.jan.Ad_Requests += respons.Ad_Requests
+              monthwiseData.jan.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.jan.Revenue += respons.Revenue
+              monthwiseData.jan.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jan.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jan.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 1) {
+              monthwiseData.feb.Ad_Requests += respons.Ad_Requests
+              monthwiseData.feb.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.feb.Revenue += respons.Revenue
+              monthwiseData.feb.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.feb.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.feb.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 2) {
+              monthwiseData.mar.Ad_Requests += respons.Ad_Requests
+              monthwiseData.mar.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.mar.Revenue += respons.Revenue
+              monthwiseData.mar.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.mar.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.mar.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 3) {
+              monthwiseData.apr.Ad_Requests += respons.Ad_Requests
+              monthwiseData.apr.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.apr.Revenue += respons.Revenue
+              monthwiseData.apr.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.apr.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.apr.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 4) {
+              monthwiseData.may.Ad_Requests += respons.Ad_Requests
+              monthwiseData.may.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.may.Revenue += respons.Revenue
+              monthwiseData.may.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.may.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.may.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 5) {
+              monthwiseData.jun.Ad_Requests += respons.Ad_Requests
+              monthwiseData.jun.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.jun.Revenue += respons.Revenue
+              monthwiseData.jun.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jun.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jun.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 6) {
+              monthwiseData.jul.Ad_Requests += respons.Ad_Requests
+              monthwiseData.jul.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.jul.Revenue += respons.Revenue
+              monthwiseData.jul.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jul.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.jul.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 7) {
+              monthwiseData.aug.Ad_Requests += respons.Ad_Requests
+              monthwiseData.aug.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.aug.Revenue += respons.Revenue
+              monthwiseData.aug.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.aug.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.aug.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 8) {
+              monthwiseData.sep.Ad_Requests += respons.Ad_Requests
+              monthwiseData.sep.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.sep.Revenue += respons.Revenue
+              monthwiseData.sep.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.sep.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.sep.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 9) {
+              monthwiseData.oct.Ad_Requests += respons.Ad_Requests
+              monthwiseData.oct.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.oct.Revenue += respons.Revenue
+              monthwiseData.oct.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.oct.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.oct.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 10) {
+              monthwiseData.nov.Ad_Requests += respons.Ad_Requests
+              monthwiseData.nov.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.nov.Revenue += respons.Revenue
+              monthwiseData.nov.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.nov.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.nov.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+            if (createDate.getMonth() == 11) {
+              monthwiseData.dec.Ad_Requests += respons.Ad_Requests
+              monthwiseData.dec.Ad_Impressions += respons.Ad_Impressions
+              monthwiseData.dec.Revenue += respons.Revenue
+              monthwiseData.dec.Calculated_Ad_Requests += respons.Ad_Requests - respons.Ad_Requests * (parseFloat(("0." + respons.commission)))
+              monthwiseData.dec.Calculated_Ad_Impressions += respons.Ad_Impressions - respons.Ad_Impressions * (parseFloat(("0." + respons.commission)))
+              monthwiseData.dec.calculatedRevenue += respons.Revenue - respons.Revenue * (parseFloat(("0." + respons.commission)))
+            }
+          })
+        )
+      }
+    });
+
+    console.log('monthwiseData', monthwiseData);
+
     return res.json({
       message: "success",
       data: { thisWeekStats, lastWeekStats, todayStats, yesterdayStats, currentMonthStats, lastMonthStats},
+      monthwiseData
     });
   } catch (e) {}
 }
